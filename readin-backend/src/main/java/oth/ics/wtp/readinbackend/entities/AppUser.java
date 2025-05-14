@@ -3,6 +3,8 @@ package oth.ics.wtp.readinbackend.entities;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity public class AppUser {
     @Id @GeneratedValue
@@ -10,6 +12,11 @@ import java.time.Instant;
    @Column(unique=true) private String name;
     private  String hashedPassword;
     private Instant createdAt;
+    @OneToMany(mappedBy = "followee")
+    private List<Follower> followers; // Users who follow this user
+
+    @OneToMany(mappedBy = "follower")
+    private List<Follower> following; // Users this user follows
 
     public AppUser() {}
 
@@ -17,6 +24,24 @@ import java.time.Instant;
         this.name = name;
         this.hashedPassword = hashedPassword;
         this.createdAt = Instant.now();
+        this.followers = new ArrayList<>();
+        this.following = new ArrayList<>();
+    }
+
+    public List<Follower> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(List<Follower> followers) {
+        this.followers = followers;
+    }
+
+    public List<Follower> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(List<Follower> following) {
+        this.following = following;
     }
 
     public String getName() {
@@ -50,4 +75,5 @@ import java.time.Instant;
     public void setId(Long id) {
         this.id = id;
     }
+
 }
