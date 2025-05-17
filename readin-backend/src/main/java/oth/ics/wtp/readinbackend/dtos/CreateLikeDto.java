@@ -4,5 +4,6 @@ import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.entities.Post;
 
 
-public record CreateLikeDto(AppUser user, Post post) {
+public record CreateLikeDto(long userId, long postId) {
+
 }

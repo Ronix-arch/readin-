@@ -1,12 +1,11 @@
 package oth.ics.wtp.readinbackend.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hibernate.annotations.OnDeleteAction.CASCADE;
 
@@ -16,6 +15,7 @@ import static org.hibernate.annotations.OnDeleteAction.CASCADE;
     private String content;
     private Instant createdAt;
     @ManyToOne @OnDelete (action = CASCADE) private AppUser user;
+    @OneToMany @OnDelete (action = CASCADE) private List<Like> likes;
 
     public Post() {
     }
@@ -24,6 +24,15 @@ import static org.hibernate.annotations.OnDeleteAction.CASCADE;
         this.content = content;
         this.user = user;
         this.createdAt = Instant.now();
+        this.likes = new ArrayList<>();
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 
     public Long getId() {

@@ -1,13 +1,12 @@
 package oth.ics.wtp.readinbackend.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import oth.ics.wtp.readinbackend.entities.Follower;
+import oth.ics.wtp.readinbackend.entities.Following;
 
 import java.util.List;
 
-public interface FollowerRepository extends JpaRepository<Follower, Long> {
+public interface FollowingRepository extends JpaRepository<Following, Long> {
     boolean existsByFollowerIdAndFolloweeId(long followerId, long followeeId);
-    List<Follower> findByFollowerId(long followerId);
-
+    List<Following> findByFollowerId(long followerId);
 
 }

@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.EAGER;
+
 @Entity public class AppUser {
     @Id @GeneratedValue
     private Long id;
@@ -13,10 +15,11 @@ import java.util.List;
     private  String hashedPassword;
     private Instant createdAt;
     @OneToMany(mappedBy = "followee")
-    private List<Follower> followers; // Users who follow this user
+    private List<Following> followers; // Users who follow this user
 
     @OneToMany(mappedBy = "follower")
-    private List<Follower> following; // Users this user follows
+    private List<Following> followings; // Users this user follows
+    @OneToMany (fetch = EAGER) private List<Post> UserPosts;
 
     public AppUser() {}
 
@@ -25,27 +28,36 @@ import java.util.List;
         this.hashedPassword = hashedPassword;
         this.createdAt = Instant.now();
         this.followers = new ArrayList<>();
-        this.following = new ArrayList<>();
+        this.followings = new ArrayList<>();
+        UserPosts = new ArrayList<>();
     }
 
-    public List<Follower> getFollowers() {
-        return followers;
+    public List<Following> getFollowers() {
+        return followers ;
     }
 
-    public void setFollowers(List<Follower> followers) {
+    public void setFollowers(List<Following> followers) {
         this.followers = followers;
     }
 
-    public List<Follower> getFollowing() {
-        return following;
+    public List<Following> getFollowings() {
+        return followings;
     }
 
-    public void setFollowing(List<Follower> following) {
-        this.following = following;
+    public void setFollowing(List<Following> followings) {
+        this.followings = followings;
     }
 
     public String getName() {
         return name;
+    }
+
+    public List<Post> getUserPosts() {
+        return UserPosts;
+    }
+
+    public void setUserPosts(List<Post> userPosts) {
+        UserPosts = userPosts;
     }
 
     public void setName(String name) {

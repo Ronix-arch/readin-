@@ -4,5 +4,5 @@ import oth.ics.wtp.readinbackend.entities.AppUser;
 
 import java.time.Instant;
 
-public record FollowerDto(long id, AppUser Follower, AppUser Followee, Instant createdAt) {
+public record FollowingDto(long id, AppUser Follower, AppUser Followee, Instant createdAt) {
 }
