@@ -38,7 +38,7 @@ public class AuthService {
     private AppUser logIn(HttpServletRequest request) {
         try {
             String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            String decoded = WeakCrypto.base64decode(authHeader.substring(authheader.index(" ")+1));
+            String decoded = WeakCrypto.base64decode(authHeader.substring(authHeader.indexOf(" ")+1));
             String [] parts = decoded.split(":");
             String username = parts[0];
             String password = parts[1];

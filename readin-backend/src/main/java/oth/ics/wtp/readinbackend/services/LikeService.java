@@ -3,7 +3,9 @@ package oth.ics.wtp.readinbackend.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oth.ics.wtp.readinbackend.ClientErrors;
+import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.entities.Like;
+import oth.ics.wtp.readinbackend.entities.Post;
 import oth.ics.wtp.readinbackend.repositories.AppUserRepository;
 import oth.ics.wtp.readinbackend.repositories.LikeRepository;
 import oth.ics.wtp.readinbackend.repositories.PostRepository;
@@ -21,12 +23,18 @@ import oth.ics.wtp.readinbackend.repositories.PostRepository;
   }
     public void likePost( long appUserId, Long postId) {
         if (!likeRepository.existsByAppUserIdAndPostId(appUserId, postId)) {
-            Like like = new Like();
-            like.setUser(appUserRepository.findById(appUserId).orElseThrow(()-> ClientErrors.userIdNotFound(appUserId)));
-            like.setPost(postRepository.findById(postId).orElseThrow(()-> ClientErrors.postNotFound(postId)));
+
+            AppUser appUser = appUserRepository.findById(appUserId).orElseThrow(()-> ClientErrors.userIdNotFound(appUserId));
+            Post post = postRepository.findById(postId).orElseThrow(()-> ClientErrors.postNotFound(postId));
+            Like like = toEntity(appUser,post);
             likeRepository.save(like);
         }
     }
+
+    private Like toEntity( AppUser appUser, Post post) {
+      return new Like(appUser,post);
+    }
+
     public void unlikePost(long appUserId, Long postId) {
         likeRepository.deleteByAppUserIdAndPostId(appUserId, postId);
     }

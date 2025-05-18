@@ -7,6 +7,7 @@ import oth.ics.wtp.readinbackend.WeakCrypto;
 import oth.ics.wtp.readinbackend.dtos.AppUserDto;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
 import oth.ics.wtp.readinbackend.entities.AppUser;
+import oth.ics.wtp.readinbackend.entities.Following;
 import oth.ics.wtp.readinbackend.repositories.AppUserRepository;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class AppUserService {
 }
 
     private AppUser toEntity(CreateAppUserDto createAppUser) {
-        String hashedPassword = WeakCrypto.hashpassword(createAppUser.password());
+        String hashedPassword = WeakCrypto.hashPassword(createAppUser.password());
         return new AppUser(createAppUser.name(),hashedPassword);
 
     }
