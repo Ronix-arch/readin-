@@ -26,7 +26,7 @@ import java.util.List;
         this.followingRepository = followingRepository;
     }
 
-    public List<PostDto> UserOwnPosts( long userId) {
+    public List<PostDto> getUserOwnPosts(long userId) {
         if (!appUserRepository.findById(userId).isPresent()) {
             throw ClientErrors.userIdNotFound(userId);  // this another method
         }
@@ -34,7 +34,7 @@ import java.util.List;
         return postRepository.findByAppUserIdOrderByCreatedAtDesc(userId).stream().map(this::toDto).toList();
 
     }
-    public List<PostDto> UserTimeLinePosts(long userId) {
+    public List<PostDto> getUserTimeLinePosts(long userId) {
         if (!appUserRepository.existsById(userId)) {
             throw ClientErrors.userIdNotFound(userId);
         }

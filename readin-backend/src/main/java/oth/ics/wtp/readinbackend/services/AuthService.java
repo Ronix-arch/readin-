@@ -35,7 +35,7 @@ public class AuthService {
         }
         return logIn(request);
     }
-    private AppUser logIn(HttpServletRequest request) {
+    public AppUser logIn(HttpServletRequest request) {
         try {
             String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             String decoded = WeakCrypto.base64decode(authHeader.substring(authHeader.indexOf(" ")+1));
@@ -55,7 +55,7 @@ public class AuthService {
         }
 
     }
-    private void logOut(HttpServletRequest request) {
+    public void logOut(HttpServletRequest request) {
         request.getSession().setAttribute(SESSION_USER_NAME, null);
     }
 
