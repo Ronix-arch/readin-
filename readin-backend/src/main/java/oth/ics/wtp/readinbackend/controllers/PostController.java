@@ -38,6 +38,7 @@ import java.util.List;
        authService.getAuthenticatedUser(request);
        return postService.getUserTimeLinePosts(appUserId);
 }
+    @ResponseStatus(HttpStatus.CREATED)
 @PostMapping(value ="appUsers/{appUserId}/posts",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public PostDto createPost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @RequestBody CreatePostDto createPostDto) {
        authService.getAuthenticatedUser(request);

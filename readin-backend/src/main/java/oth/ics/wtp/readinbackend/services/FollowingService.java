@@ -51,9 +51,9 @@ import java.util.List;
                 //.collect(Collectors.toList());
     }
 
-    public List<AppUserDto> getFollowing(long userId) {
-        List<Following> following = followingRepository.findByFollowerId(userId);
-        return following.stream()
+    public List<AppUserDto> getFollowings(long userId) {
+        List<Following> followings = followingRepository.findByFollowerId(userId);
+        return followings.stream()
                 .map(f -> appUserRepository.findById(f.getFollowee().getId())
                         .map(this::convertToDto)
                         .orElseThrow(()-> ClientErrors.userIdNotFound(f.getFollower().getId())))

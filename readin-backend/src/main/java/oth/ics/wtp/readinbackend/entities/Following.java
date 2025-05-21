@@ -11,7 +11,8 @@ import java.time.Instant;
 @Entity public class Following {
     @Id @GeneratedValue private Long id;
     @ManyToOne private AppUser follower;  // @JoinColumn(name = "follower",nullable = false)
-    @ManyToOne  private AppUser followee; //@JoinColumn(name = "followee",nullable = false)
+    @ManyToOne  private AppUser followee; //
+    // @JoinColumn(name = "followee",nullable = false)
     private Instant createdAt;
 
     public Following(){}
