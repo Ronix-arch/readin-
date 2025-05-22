@@ -22,7 +22,7 @@ import oth.ics.wtp.readinbackend.repositories.PostRepository;
 
   }
     public void likePost( long appUserId, Long postId) {
-        if (!likeRepository.existsByAppUserIdAndPostId(appUserId, postId)) {
+        if (!likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId)) {
 
             AppUser appUser = appUserRepository.findById(appUserId).orElseThrow(()-> ClientErrors.userIdNotFound(appUserId));
             Post post = postRepository.findById(postId).orElseThrow(()-> ClientErrors.postNotFound(postId));
@@ -36,13 +36,13 @@ import oth.ics.wtp.readinbackend.repositories.PostRepository;
     }
 
     public void unlikePost(long appUserId, Long postId) {
-        likeRepository.deleteByAppUserIdAndPostId(appUserId, postId);
+        likeRepository.deleteByAppUser_IdAndPost_Id(appUserId, postId);
     }
     public boolean hasUserLikedPost(long  appUserId, Long postId) {
-        return likeRepository.existsByAppUserIdAndPostId(appUserId, postId);
+        return likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId);
     }
     public int getLikeCount(Long postId) {
-      return likeRepository.countByPostId(postId);
+      return likeRepository.countByPost_Id(postId);
     }
 
 

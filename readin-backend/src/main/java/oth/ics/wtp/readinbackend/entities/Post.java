@@ -14,15 +14,25 @@ import static org.hibernate.annotations.OnDeleteAction.CASCADE;
     private Long id;
     private String content;
     private Instant createdAt;
-    @ManyToOne @OnDelete (action = CASCADE) private AppUser user;
-    @OneToMany @OnDelete (action = CASCADE) private List<Like> likes;
+    @ManyToOne
+    @JoinColumn(name = "app_user_id")  // Ensure the correct column is mapp
+
+    @OnDelete (action = CASCADE)
+    private AppUser appUser;
+
+  //  @JoinColumn(name = "post_id")  // Specify the foreign key column it refused
+   // @OnDelete (action = CASCADE) private List<Like> likes;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes;
+
+
 
     public Post() {
     }
 
-    public Post(String content, AppUser user) {
+    public Post(String content, AppUser appUser) {
         this.content = content;
-        this.user = user;
+        this.appUser = appUser;
         this.createdAt = Instant.now();
         this.likes = new ArrayList<>();
     }
@@ -59,11 +69,11 @@ import static org.hibernate.annotations.OnDeleteAction.CASCADE;
         this.createdAt = createdAt;
     }
 
-    public AppUser getUser() {
-        return user;
+    public AppUser getAppUser() {
+        return appUser;
     }
 
-    public void setUser(AppUser author) {
-        this.user = author;
+    public void setAppUser(AppUser author) {
+        this.appUser = author;
     }
 }

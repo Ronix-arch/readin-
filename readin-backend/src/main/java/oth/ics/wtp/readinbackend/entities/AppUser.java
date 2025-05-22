@@ -19,7 +19,7 @@ import static jakarta.persistence.FetchType.EAGER;
 
     @OneToMany(mappedBy = "follower")
     private List<Following> followings; // Users this user follows
-    @OneToMany (fetch = EAGER) private List<Post> UserPosts;
+    @OneToMany (fetch = EAGER) private List<Post> appUserPosts;
 
     public AppUser() {}
 
@@ -29,7 +29,7 @@ import static jakarta.persistence.FetchType.EAGER;
         this.createdAt = Instant.now();
         this.followers = new ArrayList<>();
         this.followings = new ArrayList<>();
-        UserPosts = new ArrayList<>();
+        appUserPosts = new ArrayList<>();
     }
 
     public List<Following> getFollowers() {
@@ -52,12 +52,12 @@ import static jakarta.persistence.FetchType.EAGER;
         return name;
     }
 
-    public List<Post> getUserPosts() {
-        return UserPosts;
+    public List<Post> getAppUserPosts() {
+        return appUserPosts;
     }
 
-    public void setUserPosts(List<Post> userPosts) {
-        UserPosts = userPosts;
+    public void setAppUserPosts(List<Post> appUserPosts) {
+        this.appUserPosts = appUserPosts;
     }
 
     public void setName(String name) {

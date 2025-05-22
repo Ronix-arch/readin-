@@ -31,7 +31,7 @@ import java.util.List;
             throw ClientErrors.userIdNotFound(userId);  // this another method
         }
 
-        return postRepository.findByAppUserIdOrderByCreatedAtDesc(userId).stream().map(this::toDto).toList();
+        return postRepository.findByAppUser_IdOrderByCreatedAtDesc(userId).stream().map(this::toDto).toList();
 
     }
     public List<PostDto> getUserTimeLinePosts(long userId) {
@@ -52,7 +52,7 @@ import java.util.List;
         if (!appUserRepository.existsById(userId)) {
             throw ClientErrors.userIdNotFound(userId);
         }
-        Post post = postRepository.findbyAppUserIdAndId(userId,postId).orElseThrow(()-> ClientErrors.postNotFound(postId));
+        Post post = postRepository.findByAppUser_IdAndId(userId,postId).orElseThrow(()-> ClientErrors.postNotFound(postId));
         post.setContent(updatePostDto.content());
         return toDto(postRepository.save(post));
 
@@ -61,7 +61,7 @@ import java.util.List;
         if (!appUserRepository.existsById(userId)) {
             throw ClientErrors.userIdNotFound(userId);
         }
-        if(!postRepository.existsByAppUserIdAndId(userId,postId)) {
+        if(!postRepository.existsByAppUser_IdAndId(userId,postId)) {
             throw ClientErrors.postNotFound(postId);
         }
         postRepository.deleteById(postId);
@@ -72,7 +72,7 @@ return new Post(createPostDto.content(),appUser);
     }
 
     private PostDto toDto(Post post) {
-        return new PostDto(post.getId(),post.getContent(),post.getCreatedAt(),post.getUser().getId());
+        return new PostDto(post.getId(),post.getContent(),post.getCreatedAt(),post.getAppUser().getId());
     }
 
 
