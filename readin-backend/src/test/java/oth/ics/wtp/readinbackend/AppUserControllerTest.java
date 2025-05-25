@@ -36,7 +36,7 @@ public class AppUserControllerTest extends ReadinControllerTestBase{
        // long appUserId1 = appUserController.createAppUser(new CreateAppUserDto("user1","password1")).id();
         //long postId1 = postController.createPost(user0(),appUserId1,new CreatePostDto( "post1")).id();
         appUserController.createAppUser(new CreateAppUserDto("user1", "password1"));
-        appUserController.logIn(mockRequest("user1","password1"));
+       // appUserController.logIn(mockRequest("user1","password1"));
         assertDoesNotThrow(() -> appUserController.logIn(mockRequest("user1","password1")));
         assertDoesNotThrow(()->appUserController.logOut(mockRequest("user1","password1")));
     }
@@ -46,10 +46,14 @@ public class AppUserControllerTest extends ReadinControllerTestBase{
         appUserController.createAppUser(new CreateAppUserDto("user2", "password2"));
         AppUserDto appUser = appUserController.getAppUser(user0(),"user1");
         assertEquals("user1",appUser.name());
+        assertThrows(ResponseStatusException.class, ()->appUserController.getAppUser(mockRequest("userNon","notAuthenticated"),"user1"));// testing the authservice
         appUserController.deleteAppUser(user0(),"user1");
         assertThrows(ResponseStatusException.class, ()->appUserController.getAppUser(user0(),"user1"));
 
 
+
     }
+
+
 
 }

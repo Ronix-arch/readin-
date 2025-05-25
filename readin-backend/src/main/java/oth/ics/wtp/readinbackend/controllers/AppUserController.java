@@ -3,6 +3,7 @@ package oth.ics.wtp.readinbackend.controllers;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ import java.util.List;
 public class AppUserController {
  private final AuthService authService;
  private final AppUserService appUserService;
- public AppUserController(AuthService authService, AppUserService appUserService) {
+ @Autowired public AppUserController(AuthService authService, AppUserService appUserService) {
      this.authService = authService;
      this.appUserService = appUserService;
  }

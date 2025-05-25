@@ -2,6 +2,7 @@ package oth.ics.wtp.readinbackend.controllers;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,8 @@ public class FollowingController {
     private final AuthService authService;
     private final FollowingService followingService;
 
-    public FollowingController(AuthService authService, FollowingService followingService) {
+   @Autowired
+   public FollowingController(AuthService authService, FollowingService followingService) {
         this.authService = authService;
         this.followingService = followingService;
     }

@@ -2,6 +2,7 @@ package oth.ics.wtp.readinbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import oth.ics.wtp.readinbackend.ClientErrors;
 import oth.ics.wtp.readinbackend.dtos.AppUserDto;
 import oth.ics.wtp.readinbackend.entities.AppUser;
@@ -29,9 +30,10 @@ import java.util.List;
             followingRepository.save(following);
 
     }
+    @Transactional
     public void unfollowUser(long followerId, long  followeeId) {
-        if (followingRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw ClientErrors.followingAlreadyExsists(followerId,followeeId);
+        if (!followingRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
+            throw ClientErrors.followingDoesNotExsists(followerId,followeeId);
         }
 
         followingRepository.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
