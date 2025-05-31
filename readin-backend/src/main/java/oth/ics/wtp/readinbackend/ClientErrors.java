@@ -43,4 +43,7 @@ public class ClientErrors {
     public static ResponseStatusException followingDoesNotExsists(long followerId, long followeeId) {
         return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the Following relationship between followerid  " + followerId + " and followeid " + followeeId+" does not exists" ));
     }
+    public static ResponseStatusException userAlreadyLikedPost(long appUserId,long postId) {
+        return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the User withe appUserId  " + appUserId + " has already liked the post with the postId  " + postId ));
+    }
 }

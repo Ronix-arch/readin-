@@ -42,7 +42,7 @@ import oth.ics.wtp.readinbackend.services.LikeService;
         return likeService.hasUserLikedPost(appUserId, postId);
 }
     @GetMapping(value = "appUsers/posts/{postId}/likeCount",produces = MediaType.APPLICATION_JSON_VALUE)
-    public int getLikeCount(HttpServletRequest request,long appUserId, @PathVariable("postId") long postId) {
+    public int getLikeCount(HttpServletRequest request, @PathVariable("postId") long postId) {
         authService.getAuthenticatedUser(request); // do not know if this is needed
         return likeService.getLikeCount(postId);
     }

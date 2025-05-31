@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/ics-wtp-readin.iml" filepath="$PROJECT_DIR$/.idea/ics-wtp-readin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/readin-backend/readin-backend.iml" filepath="$PROJECT_DIR$/readin-backend/readin-backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/readin-frontend/readin-frontend.iml" filepath="$PROJECT_DIR$/readin-frontend/readin-frontend.iml" />
+    </modules>
+  </component>
+</project>

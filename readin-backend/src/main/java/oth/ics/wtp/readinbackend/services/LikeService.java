@@ -2,6 +2,7 @@ package oth.ics.wtp.readinbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import oth.ics.wtp.readinbackend.ClientErrors;
 import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.entities.Like;
@@ -22,19 +23,21 @@ import oth.ics.wtp.readinbackend.repositories.PostRepository;
 
   }
     public void likePost( long appUserId, Long postId) {
-        if (!likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId)) {
+        if (likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId)) {
+            throw ClientErrors.userAlreadyLikedPost(appUserId,postId);
+        }
 
             AppUser appUser = appUserRepository.findById(appUserId).orElseThrow(()-> ClientErrors.userIdNotFound(appUserId));
             Post post = postRepository.findById(postId).orElseThrow(()-> ClientErrors.postNotFound(postId));
             Like like = toEntity(appUser,post);
             likeRepository.save(like);
-        }
+
     }
 
     private Like toEntity( AppUser appUser, Post post) {
       return new Like(appUser,post);
     }
-
+    @Transactional
     public void unlikePost(long appUserId, Long postId) {
         likeRepository.deleteByAppUser_IdAndPost_Id(appUserId, postId);
     }
