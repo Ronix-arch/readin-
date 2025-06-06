@@ -30,7 +30,7 @@ public class AppUserController {
      return appUserService.appUsersList();
  }
  @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "appUser",produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "appUsers",produces = MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public AppUserDto createAppUser(@RequestBody CreateAppUserDto createAppUser) {
      return appUserService.create(createAppUser);
  }
