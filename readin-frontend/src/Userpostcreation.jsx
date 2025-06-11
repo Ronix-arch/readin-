@@ -1,0 +1,51 @@
+import {useState} from "react";
+import {useContext} from "react";
+import {Api} from "./Context.js";
+import { basicJson} from "./Headers.js";
+
+export default function CreatePostCreation({auth, updatePosts}) {
+    const api = useContext(Api);
+    const userId = auth.id;
+    //const content = useRef(undefined);
+    const [newPost, setNewPost] = useState("");
+
+
+    function handleInputChange(event) {
+        setNewPost(event.target.value);
+    }
+
+
+
+
+    function createPost(appUserId) {
+        const newPost = {content: newPost};
+        fetch(api + "appUsers/"+appUserId+"/posts",{headers: basicJson(auth),method: "POST", body: JSON.stringify(newPost)})
+            .then(response => {
+            if (response.ok) return response.json();
+            else throw new Error(response.statusText);
+            }).then(()=>{
+                updatePosts(prevPosts => [newPost,...prevPosts]);
+                setNewPost(""); //clear the input after creating a post
+        }).catch(error => console.error("Error in creating  post: ", error));
+
+
+
+    }
+
+
+    return (
+    <div>
+        <p>Enter your post below </p>
+            <input
+                type="text"
+                placeholder="What is on your Mind? Write about it"
+                value={newPost}
+                onChange={handleInputChange}
+            />
+            <button onClick={() => createPost(userId)}>Create Post</button>
+    </div>
+    );
+
+
+        }
+

@@ -37,7 +37,7 @@ export default function Login(auth, setAuth) {
         }).then(() => {
             newAuth.loggedIn = true;
             setAuth(newAuth);
-        });
+        }).catch(error => console.error("Error in creating  an Account: ", error));
     }
     if (auth.loggedIn){
         return <>
