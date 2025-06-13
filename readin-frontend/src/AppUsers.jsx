@@ -14,12 +14,14 @@ export  default  function Users ({auth}){
                 else throw new Error(response.statusText);
             }).then(result =>{
                 setUsers(result);
+            result.forEach(user => isFollowing(auth.id, user.id));
 
-        });
-    },[api]);
+            });
+
+    },[api,auth.id]); // here there is a problem
 
     function  isFollowing(followerId, followeeId){
-        fetch( api + "/appUsers"+ followerId+ "/following/"+followeeId,{ headers: basic(auth)})
+        fetch( api + "/appUsers/"+ followerId+ "/following/"+followeeId,{ headers: basic(auth)})
             .then(response =>{
                 if(!response.ok) throw new Error(response.statusText);
                 return response.json();      // we expect a boolen value.
@@ -31,7 +33,7 @@ export  default  function Users ({auth}){
     }
 
     function  followuser(followerId, followeeId){                                                           // is here header a right choice
-        fetch( api + "/appUsers"+ followerId+ "/following/"+followeeId,{method: "POST", headers: basic(auth)})
+        fetch( api + "/appUsers/"+ followerId+ "/following/"+followeeId,{method: "POST", headers: basic(auth)})
         .then(response =>{
             if (!response.ok) throw new Error(response.statusText);
             return isFollowing(followerId, followeeId);
@@ -41,7 +43,7 @@ export  default  function Users ({auth}){
 
 }
     function  unfollowuser(followerId, followeeId){
-        fetch( api + "/appUsers"+ followerId+ "/following/"+followeeId,{method: "DELETE", headers: basic(auth)})
+        fetch( api + "/appUsers/"+ followerId+ "/following/"+followeeId,{method: "DELETE", headers: basic(auth)})
             .then(response =>{
                 if (!response.ok) throw new Error(response.statusText);
                 return isFollowing(followerId, followeeId);

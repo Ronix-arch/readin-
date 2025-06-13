@@ -2,7 +2,7 @@ import{useContext, useRef,useState} from 'react';
 import {Api} from "./Context.js";
 import {basic, anonJson} from "./Headers.js";
 
-export default function Login(auth, setAuth) {
+export default function Login({auth, setAuth}) {
     const api = useContext(Api);
     const [createAccount, setCreateAccount] = useState(false);
     const name = useRef(undefined);
@@ -15,7 +15,9 @@ export default function Login(auth, setAuth) {
             setAuth({name: null, password: null, loggedIn: false});
             // is set use r possible?
 
-        });
+        }).catch(error => console.error("Error logging out:", error));
+
+
     }
 
     function logIn(){
@@ -27,11 +29,13 @@ export default function Login(auth, setAuth) {
 
             newAuth.loggedIn = true;
             setAuth(newAuth);
-        });
+        }).catch(error => console.error("Error logging in:", error));
+
+
     }
     function register(){
         const newAuth = {name: name.current.value, password: password.current.value};
-        fetch(api + "/appUsers",{method: "POST",headers: anonJson(), body: JSON.stringify(newAuth)}).then(response => {
+        fetch(api + "/appUsers" ,{method: "POST",headers: anonJson(), body: JSON.stringify(newAuth)}).then(response => {
             if (response.ok) return response.json();
             else throw new Error(response.statusText);
         }).then(() => {
@@ -48,7 +52,7 @@ export default function Login(auth, setAuth) {
     return<>
         <p> Curently not logged in.</p>
         <div>
-            <input id = "new-account" type="checkbox" defaultValue={createAccount}
+            <input id = "new-account" type="checkbox" checked={createAccount}
                    onChange={e =>setCreateAccount(e.target.checked)} />
             <label htmlFor="new-account">I want to create a new account </label>
         </div>

@@ -26,7 +26,7 @@ export default function UserProfilePosts({auth}) {
     },[api, userId]);
 
     function numberOfLikePost (postId) {
-        fetch(api + "appUsers/posts/"+ postId +"/likeCount",{headers: basic(auth)})
+        fetch(api + "/appUsers/posts/"+ postId +"/likeCount",{headers: basic(auth)})
             .then(response =>{
                 if(!response.ok) throw  new Error(response.statusText);
                 return response.json();
