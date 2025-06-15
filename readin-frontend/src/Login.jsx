@@ -12,7 +12,7 @@ export default function Login({auth, setAuth}) {
         fetch(api + "/appUsers/logout",{method: "POST",headers:basic(auth)}).then(response => {
             if (!response.ok) throw new Error(response.statusText);
         }).then(()=>{
-            setAuth({name: null, password: null, loggedIn: false});
+            setAuth({id: null,name: null, password: null, loggedIn: false});
             // is set use r possible?
 
         }).catch(error => console.error("Error logging out:", error));
@@ -22,11 +22,19 @@ export default function Login({auth, setAuth}) {
 
     function logIn(){
         const newAuth = {name: name.current.value, password: password.current.value};
-        fetch(api+"/appUsers/login",{method: "POST",headers:basic(newAuth)}).then(response => {
-            if (response.ok) return response.json();
-            else throw new Error(response.statusText);
-        }).then(() => {
+        fetch(api+"/appUsers/login",{method: "POST",headers:basic(newAuth)})
+            // .then(response => {
+            // if (response.ok) return response.json();
+            // else throw new Error(response.statusText);
+            .then(response => response.text()) // Read raw response first
+            .then(text => {
+                console.log("Login response as text:", text);
+                return JSON.parse(text); // Attempt parsing manually
+            })
 
+
+            .then(result  => {
+            newAuth.id = result.id;   // that was the problem.
             newAuth.loggedIn = true;
             setAuth(newAuth);
         }).catch(error => console.error("Error logging in:", error));
@@ -38,7 +46,8 @@ export default function Login({auth, setAuth}) {
         fetch(api + "/appUsers" ,{method: "POST",headers: anonJson(), body: JSON.stringify(newAuth)}).then(response => {
             if (response.ok) return response.json();
             else throw new Error(response.statusText);
-        }).then(() => {
+        }).then(result => {
+            newAuth.id = result.id; // also here
             newAuth.loggedIn = true;
             setAuth(newAuth);
         }).catch(error => console.error("Error in creating  an Account: ", error));

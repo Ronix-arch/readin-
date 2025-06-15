@@ -21,6 +21,7 @@ public class AuthService {
     public AuthService(AppUserRepository appUserRepository) {
         this.appUserRepository = appUserRepository;
     }
+
     public AppUser getAuthenticatedUser(HttpServletRequest request) {
         Object sessionUserName = request.getSession().getAttribute(SESSION_USER_NAME);
         if (sessionUserName instanceof String userName) {

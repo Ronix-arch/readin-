@@ -18,13 +18,13 @@ export default function CreatePostCreation({auth, updatePosts}) {
 
 
     function createPost(appUserId) {
-        const newPost = {content: newPost};
-        fetch(api + "appUsers/"+appUserId+"/posts",{headers: basicJson(auth),method: "POST", body: JSON.stringify(newPost)})
+        const newuserPost = {content: newPost};
+        fetch(api + "/appUsers/"+appUserId+"/posts",{headers: basicJson(auth),method: "POST", body: JSON.stringify(newuserPost)})
             .then(response => {
             if (response.ok) return response.json();
             else throw new Error(response.statusText);
-            }).then(()=>{
-                updatePosts(prevPosts => [newPost,...prevPosts]);
+            }).then(result=>{
+                updatePosts(prevPosts => [result,...prevPosts]);
                 setNewPost(""); //clear the input after creating a post
         }).catch(error => console.error("Error in creating  post: ", error));
 

@@ -25,7 +25,7 @@ export default function TimelinePosts({auth}) {
             .catch(error => console.error("Error in fetching posts: ", error));
 
 
-    },[api, userId]);
+    },[api, userId,auth]);
 
     useEffect(() => {
         posts.forEach(post => hasUserLikedPost(userId, post.id));
@@ -36,7 +36,8 @@ export default function TimelinePosts({auth}) {
         if(posts.length > 0) {
             posts.forEach(post => numberOfLikePost(post.id));
         }//  to Ensure like count is fetched after posts load
-    }, [posts]);
+    }, [ posts]);
+    
 
 
     function hasUserLikedPost (appUserId, postId) {
@@ -77,6 +78,7 @@ export default function TimelinePosts({auth}) {
         })
             .catch(error => console.error("Error in getting no of likes of a post: ", error));
     }
+    
 
     return (
         <>
@@ -87,8 +89,8 @@ export default function TimelinePosts({auth}) {
                 <p>{p.content}</p>
                 <div className="grid">
                     {likeStatus[p.id] !== undefined &&(
-                        likeStatus[p.id] ?<button onClick={()=> likePost(userId, p.id)}>Like </button> :
-                            <button onClick={()=> unlikePost(userId, p.id)}>Unlike</button>
+                        likeStatus[p.id] ?<button onClick={()=> unlikePost(userId, p.id)}> UnLike </button> :
+                            <button onClick={()=> likePost(userId, p.id)}>Like</button>
 
                     )}
                     <p>Number of likes: {likeCounts[p.id] || 0}</p>

@@ -27,7 +27,8 @@ public class AppUserService {
     }
 
     private AppUserDto toDto(AppUser appUser) {
-        return new AppUserDto(appUser.getId(),appUser.getName(),appUser.getCreatedAt(),appUser.getFollowers(),appUser.getFollowings());
+
+        return new AppUserDto(appUser.getId(),appUser.getName(),appUser.getCreatedAt());
     }
 
     public AppUserDto create(CreateAppUserDto createAppUser) {

@@ -4,21 +4,30 @@ import {basic} from "./Headers.js";
 
 export  default  function Users ({auth}){
     const api = useContext(Api);
+    const userId = auth.id;
     const [users, setUsers] = useState([]);
-    const[followingStatus, setFollowingStatus] = useState({}); // not sure
+    const[followingStatus, setFollowingStatus] = useState({});
 
     useEffect(()=>{
-        fetch(api+ "/appUsers",{headers: basic(auth)})
+
+        if (!auth?.id) {
+            console.error("User ID is undefined!");   // this was for debugging
+            return;
+        }
+            fetch(api+ "/appUsers",{headers: basic(auth)})
             .then(response =>{
                 if(response.ok) return response.json();
                 else throw new Error(response.statusText);
             }).then(result =>{
-                setUsers(result);
-            result.forEach(user => isFollowing(auth.id, user.id));
+                const filteredUsers = result.filter(user => user.id !== auth.id);
+                setUsers(filteredUsers);
+
+                filteredUsers.forEach(user => isFollowing(auth.id, user.id));
+
 
             });
 
-    },[api,auth.id]); // here there is a problem
+    },[api, auth]); // it is solved  problem
 
     function  isFollowing(followerId, followeeId){
         fetch( api + "/appUsers/"+ followerId+ "/following/"+followeeId,{ headers: basic(auth)})
@@ -58,8 +67,8 @@ export  default  function Users ({auth}){
         <div className= "grid">
             <p>{u.name}</p>
             {followingStatus[u.id] !== undefined && (
-                followingStatus[u.id] ? (<button onClick ={() => unfollowuser(auth.id ,u.id)}>Unfollow</button>) : (
-                    <button onClick ={() => followuser(auth.id ,u.id)}>follow</button>
+                followingStatus[u.id] ? (<button onClick ={() => unfollowuser(userId ,u.id)}>Unfollow</button>) : (
+                    <button onClick ={() => followuser(userId ,u.id)}>follow</button>
                 )
             ) }
 

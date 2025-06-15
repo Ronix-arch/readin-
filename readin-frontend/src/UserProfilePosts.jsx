@@ -23,7 +23,7 @@ export default function UserProfilePosts({auth}) {
             .catch(error => console.error("Error in fetching posts: ", error));
 
 
-    },[api, userId]);
+    },[api, auth,userId]);
 
     function numberOfLikePost (postId) {
         fetch(api + "/appUsers/posts/"+ postId +"/likeCount",{headers: basic(auth)})
@@ -35,12 +35,12 @@ export default function UserProfilePosts({auth}) {
         })
             .catch(error => console.error("Error in getting no of likes of a post: ", error));
     }
-// makes sure the number of likes is fetched after the posts load.
+// to make sure the number of likes is fetched after the posts load.
     useEffect(() => {
         if (posts.length > 0) {
             posts.forEach(post => numberOfLikePost(post.id));
         }
-    }, [posts]);
+    }, [ posts]);
 
 
 
@@ -80,15 +80,16 @@ return(
             <li key={p.id}>
                 <p>{p.content}</p>
                 <p>Number of Likes: {likeCounts[p.id]|| 0}</p>
-                <div>
+                <div className= "grid">
                    <input  type ="text"
                            placeholder="Edit this Post Content "
                            value={editPostContent}
                            onChange={(e) => setEditPostContent(e.target.value)}
                    />
                     <button onClick={()=> updateuserposts(userId,p.id)}>Update Post</button>
+                    <button onClick={()=>deletePost(userId,p.id)}>Delete Post</button>
                 </div>
-                <button onClick={()=>deletePost(userId,p.id)}>Delete Post</button>
+
 
             </li>
         ))}

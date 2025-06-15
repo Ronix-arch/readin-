@@ -65,7 +65,7 @@ import java.util.List;
 
     }
     private AppUserDto convertToDto(AppUser appUser) {
-        return new AppUserDto(appUser.getId(),appUser.getName(),appUser.getCreatedAt(),appUser.getFollowers(),appUser.getFollowings());
+        return new AppUserDto(appUser.getId(),appUser.getName(),appUser.getCreatedAt());
     }
     private Following toEntity(AppUser follower, AppUser followee) {
      return new Following(follower,followee);

@@ -31,7 +31,7 @@ export default function UserProfile ({auth, username, useRId}) {
             setFollowersCount(result.length); // followers list is returned
         })
             .catch(error => console.error("Error fetching followers:", error));
-    },[api, userId])
+    },[api, userId,auth])
 
     useEffect(()=> {
         fetch(api + "/appUsers/" + userId + "/following/followees", {headers: basic(auth)})
@@ -44,10 +44,10 @@ export default function UserProfile ({auth, username, useRId}) {
         })
             .catch(error => console.error("Error fetching followees:", error));
     },[api, userId])
-
+  // STILL WORKING ON IT
 
 return<>
-    <div>
+    <div className="grid">
         <p>Username: {username}</p>
         <button onClick={() => setIsOpen(!isOpen)}>followers: {followersCount}</button>
         {isOpen && (  <ul className= "dropdown-menu">{followers.map(follower => (
@@ -73,9 +73,9 @@ return<>
 
 
     </div>
-    <CreatePostCreation auth={auth} /> //  same for this
+    {/*<CreatePostCreation auth={auth} /> //  same for this*/}
 
-    <UserProfilePosts auth={auth}/>  // adjust it for other users??? may be may be not
+    <UserProfilePosts auth={auth}/>
 
 
 </>
