@@ -2,7 +2,6 @@ import {useContext, useEffect, useState} from "react";
 import {Api} from "./Context.js";
 import {basic} from "./Headers.js";
 import  UserProfilePosts from "./UserProfilePosts.jsx";
-import CreatePostCreation from "./Userpostcreation.jsx";
 
 
 
@@ -13,7 +12,6 @@ export default function UserProfile ({auth, username, useRId}) {
     const [followees, setFollowees] = useState([]);
     const [followersCount, setFollowersCount] = useState(0);
     const [followeesCount, setFolloweesCount] = useState(0);
-    const [isOpen, setIsOpen] = useState(false);
 
 
 
@@ -43,43 +41,52 @@ export default function UserProfile ({auth, username, useRId}) {
             setFolloweesCount(result.length); // followers list is returned
         })
             .catch(error => console.error("Error fetching followees:", error));
-    },[api, userId])
+    },[api, userId, auth])
   // STILL WORKING ON IT
 
 return<>
     <div className="grid">
         <h3>Username: {username}</h3>
-        <button onClick={() => setIsOpen(!isOpen)}>followers: {followersCount}</button>
-        {isOpen && (  <ul className= "dropdown-menu">{followers.map(follower => (
-            <li key={follower.id}>
-                <div className="grid">
-                    <p>{follower.name}</p>
-                    <button onClick={<UserProfile auth={auth} username={follower.name} useRId={follower.id}/>}>See UserProfile</button>
-                </div>
-            </li>
-        ))}</ul>)
-        }
 
-        <button onClick={() => setIsOpen(!isOpen)}>followees: {followeesCount}</button>
-        {isOpen && (  <ul className= "dropdown-menu">{followees.map(followee => (
-            <li key={followee.id}>
-                <div className="grid">
-                    <p>{followee.name}</p>
-                    <button onClick={<UserProfile auth={auth} username={followee.name} useRId={followee.id}/>}>See UserProfile</button>
-                </div>
-            </li>
-        ))}</ul>)
-        }
+
+        <details className="dropdown">
+            <summary role="button">
+                followers: {followersCount}
+            </summary>
+            <ul>{followers.map(follower => (
+                <li key={follower.id}>
+                    <div className="grid">
+                        <p>{follower.name}</p>
+                        <button onClick={() => window.location.href = `/user/${follower.id}`}>See UserProfile</button>
+                    </div>
+                </li>
+            ))} </ul>
+        </details>
+
+        <details className="dropdown">
+            <summary role="button">
+                followees: {followeesCount}
+            </summary>
+            <ul>{followees.map(followee => (
+                <li key={followee.id}>
+                    <div className="grid">
+                        <p>{followee.name}</p>
+                        <button onClick={() => window.location.href = `/user/${followee.id}`}>See UserProfile</button>
+                    </div>
+                </li>
+            ))} </ul>
+        </details>
+
 
 
     </div>
-    {/*<CreatePostCreation auth={auth} /> //  same for this*/}
 
-    <UserProfilePosts auth={auth}/>
+
+    <UserProfilePosts auth={auth} />
+
 
 
 </>
-
 
 
 }

@@ -3,9 +3,9 @@ import {Api} from "./Context.js";
 import {basic} from "./Headers.js";
 import CreatePostcreation from "./Userpostcreation.jsx"; // i might leave it out not so important.
 
-export default function TimelinePosts({auth}) {
+export default function TimelinePosts({auth, userId}) {
     const api = useContext(Api);
-    const userId = auth.id;
+
     const [posts, setPosts] = useState([]);
     //const [page, setPage] = useState(1);
     const [likeCounts, setLikeCounts] = useState({});
