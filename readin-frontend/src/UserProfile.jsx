@@ -48,7 +48,7 @@ export default function UserProfile ({auth, username, useRId}) {
 
 return<>
     <div className="grid">
-        <p>Username: {username}</p>
+        <h3>Username: {username}</h3>
         <button onClick={() => setIsOpen(!isOpen)}>followers: {followersCount}</button>
         {isOpen && (  <ul className= "dropdown-menu">{followers.map(follower => (
             <li key={follower.id}>

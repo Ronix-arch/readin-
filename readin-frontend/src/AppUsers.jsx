@@ -7,6 +7,10 @@ export  default  function Users ({auth}){
     const userId = auth.id;
     const [users, setUsers] = useState([]);
     const[followingStatus, setFollowingStatus] = useState({});
+    const [newUserName, setNewUserName] = useState("");
+    const [newSearchedUser, setNewSearchedUser] = useState({});
+    const [isOpen, setIsOpen] = useState(false);
+
 
     useEffect(()=>{
 
@@ -60,22 +64,70 @@ export  default  function Users ({auth}){
 
 }
 
+function findUserByUsername(searchedusername){
+        fetch(api+ "/appUsers/"+ searchedusername,{method: "GET", headers: basic(auth)})
+    .then(response =>{
+        if(!response.ok) throw new Error(response.statusText);
+        return response.json();
 
-    return (
-    <ul>{users.map( u =>
-    <li key={u.id}>
-        <div className= "grid">
-            <p>{u.name}</p>
-            {followingStatus[u.id] !== undefined && (
-                followingStatus[u.id] ? (<button onClick ={() => unfollowuser(userId ,u.id)}>Unfollow</button>) : (
-                    <button onClick ={() => followuser(userId ,u.id)}>follow</button>
+    }).then(result=>{
+        setNewSearchedUser(result);
+            setIsOpen(!isOpen);  // the proble is the same button can be the searche user disappear
+        }).catch(error => console.error("Error finding user:", error));
+
+}
+
+    function handleInputChange(event) {
+        setNewUserName(event.target.value);
+    }
+
+
+
+    return (<>
+            <div>
+                <p>Search User by User Name </p>
+                <input
+                    type="text"
+                    placeholder="Write here the full username"
+                    value={newUserName}
+                    onChange={handleInputChange}
+                />
+                <button onClick={() => findUserByUsername(newUserName)}>Search User</button>
+
+                {isOpen && (
+                    <div className= "grid">
+                        <p>{newSearchedUser.name}</p>
+                        {followingStatus[newSearchedUser.id] !== undefined && (
+                            followingStatus[newSearchedUser.id] ? (<button onClick ={() => unfollowuser(userId ,newSearchedUser.id)}>Unfollow</button>) : (
+                                <button onClick ={() => followuser(userId ,newSearchedUser.id)}>follow</button>
+                            )
+                        ) }
+
+
+                    </div>
+
+
                 )
-            ) }
+                }
+            </div>
+
+            <ul>{users.map( u =>
+                <li key={u.id}>
+                    <div className= "grid">
+                        <p>{u.name}</p>
+                        {followingStatus[u.id] !== undefined && (
+                            followingStatus[u.id] ? (<button onClick ={() => unfollowuser(userId ,u.id)}>Unfollow</button>) : (
+                                <button onClick ={() => followuser(userId ,u.id)}>follow</button>
+                            )
+                        ) }
 
 
-        </div>
-    </li>)}
-    </ul>
+                    </div>
+                </li>)}
+            </ul>
+        </>
+
+
     )
 
 }

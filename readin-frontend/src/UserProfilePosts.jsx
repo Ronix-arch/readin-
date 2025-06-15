@@ -56,6 +56,7 @@ export default function UserProfilePosts({auth}) {
             })
             .then(result =>{
                 setPosts(posts.map(p=>(p.id === postId? result : p )));
+                setEditPostContent(""); // clear the input after  new
             })
             .catch(error => console.error("Error in UPDATING  post: ", error));
     }
@@ -73,12 +74,14 @@ export default function UserProfilePosts({auth}) {
 
 return(
     <>
-    <h2> User Own Posts </h2>
+
     <CreatePostcreation auth = {auth} updatePosts={setPosts} />
+        <h2> User Own Posts </h2>
     <ul>
         {posts.map((p) => (
             <li key={p.id}>
                 <p>{p.content}</p>
+                <p>Posted on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
                 <p>Number of Likes: {likeCounts[p.id]|| 0}</p>
                 <div className= "grid">
                    <input  type ="text"
