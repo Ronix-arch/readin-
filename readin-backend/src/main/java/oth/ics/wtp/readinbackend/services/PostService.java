@@ -1,6 +1,8 @@
 package oth.ics.wtp.readinbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import oth.ics.wtp.readinbackend.ClientErrors;
 import oth.ics.wtp.readinbackend.dtos.CreatePostDto;
@@ -31,14 +33,26 @@ import java.util.List;
             throw ClientErrors.userIdNotFound(userId);  // this another method
         }
 
-        return postRepository.findByAppUser_IdOrderByCreatedAtDesc(userId).stream().map(this::toDto).toList();
+//        return postRepository.findByAppUser_IdOrderByCreatedAtDesc(userId).stream().map(this::toDto).toList();
+        Pageable topTwenty = PageRequest.of(0, 20);
+        return postRepository
+                .findByAppUser_IdOrderByCreatedAtDesc(userId, topTwenty)
+                .stream()
+                .map(this::toDto)
+                .toList();
 
     }
     public List<PostDto> getUserTimeLinePosts(long userId) {
         if (!appUserRepository.existsById(userId)) {
             throw ClientErrors.userIdNotFound(userId);
         }
-        return postRepository.findTimelinePosts(userId).stream().map(this::toDto).toList();
+//        return postRepository.findTimelinePosts(userId).stream().map(this::toDto).toList();
+        Pageable topTwenty = PageRequest.of(0, 20);
+        return postRepository
+                .findTimelinePosts(userId, topTwenty)
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
     public PostDto createPost(long userId, CreatePostDto createPostDto) {
         AppUser appUser = appUserRepository.findById(userId).orElseThrow(()-> ClientErrors.userIdNotFound(userId));
@@ -72,7 +86,7 @@ return new Post(createPostDto.content(),appUser);
     }
 
     private PostDto toDto(Post post) {
-        return new PostDto(post.getId(),post.getContent(),post.getCreatedAt(),post.getAppUser().getId());
+        return new PostDto(post.getId(),post.getContent(),post.getCreatedAt(),post.getAppUser().getId(), post.getAppUser().getName());
     }
 
 

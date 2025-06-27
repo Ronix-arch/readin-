@@ -35,7 +35,7 @@ export default function CreatePostCreation({auth, updatePosts}) {
 
     return (
     <div>
-        <p>Enter your post below </p>
+        <p>Enter your post below ✍️</p>
             <input
                 type="text"
                 placeholder="What is on your Mind? Write about it"

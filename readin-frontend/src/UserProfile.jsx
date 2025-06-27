@@ -5,9 +5,8 @@ import  UserProfilePosts from "./UserProfilePosts.jsx";
 
 
 
-export default function UserProfile ({auth, username, useRId}) {
+export default function UserProfile({ auth, username, userId, onNavigateToProfile }) {
     const api = useContext(Api);
-    const userId = useRId;
     const [followers, setFollowers] = useState([]);
     const [followees, setFollowees] = useState([]);
     const [followersCount, setFollowersCount] = useState(0);
@@ -20,6 +19,10 @@ export default function UserProfile ({auth, username, useRId}) {
 
 
     useEffect(()=> {
+        if (!userId) {
+            return;
+        }
+
         fetch(api + "/appUsers/" + userId + "/following/followers", {headers: basic(auth)})
             .then(response => {
                 if (response.ok) return response.json();
@@ -29,9 +32,9 @@ export default function UserProfile ({auth, username, useRId}) {
             setFollowersCount(result.length); // followers list is returned
         })
             .catch(error => console.error("Error fetching followers:", error));
-    },[api, userId,auth])
 
-    useEffect(()=> {
+
+
         fetch(api + "/appUsers/" + userId + "/following/followees", {headers: basic(auth)})
             .then(response => {
                 if (response.ok) return response.json();
@@ -57,7 +60,10 @@ return<>
                 <li key={follower.id}>
                     <div className="grid">
                         <p>{follower.name}</p>
-                        <button onClick={() => window.location.href = `/user/${follower.id}`}>See UserProfile</button>
+                        <button onClick={() => onNavigateToProfile(follower.id,follower.name)}>
+                            See UserProfile
+                        </button>
+                        {/* <button onClick={() => window.location.href = `/user/${follower.id}`}>See UserProfile</button>*/}
                     </div>
                 </li>
             ))} </ul>
@@ -71,7 +77,10 @@ return<>
                 <li key={followee.id}>
                     <div className="grid">
                         <p>{followee.name}</p>
-                        <button onClick={() => window.location.href = `/user/${followee.id}`}>See UserProfile</button>
+                        <button onClick={() => onNavigateToProfile(followee.id, followee.name)}>
+                            See UserProfile
+                        </button>
+                        {/* <button onClick={() => window.location.href = `/user/${followee.id}`}>See UserProfile</button>*/}
                     </div>
                 </li>
             ))} </ul>
@@ -82,7 +91,8 @@ return<>
     </div>
 
 
-    <UserProfilePosts auth={auth} />
+    {/*<UserProfilePosts auth={auth} />*/}
+    <UserProfilePosts auth={auth} userId={userId} />
 
 
 

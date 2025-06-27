@@ -85,10 +85,10 @@ function findUserByUsername(searchedusername){
 
     return (<>
             <div>
-                <p>Search User by User Name </p>
+                <p>Search User by User Name 🔍 </p>
                 <input
                     type="text"
-                    placeholder="Write here the full username"
+                    placeholder="Write here the full username ✍️"
                     value={newUserName}
                     onChange={handleInputChange}
                 />
@@ -109,6 +109,9 @@ function findUserByUsername(searchedusername){
 
                 )
                 }
+                <div>
+                Users You can follow:
+                </div>
             </div>
 
             <ul>{users.map( u =>
