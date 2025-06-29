@@ -1,6 +1,7 @@
 package oth.ics.wtp.readinbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,31 +29,25 @@ import java.util.List;
         this.followingRepository = followingRepository;
     }
 
-    public List<PostDto> getUserOwnPosts(long userId) {
-        if (!appUserRepository.findById(userId).isPresent()) {
+    public Page<PostDto> getUserOwnPosts(long userId,Pageable pageable) {
+        if (!appUserRepository.existsById(userId)) {
             throw ClientErrors.userIdNotFound(userId);  // this another method
         }
 
 //        return postRepository.findByAppUser_IdOrderByCreatedAtDesc(userId).stream().map(this::toDto).toList();
-        Pageable topTwenty = PageRequest.of(0, 20);
+
         return postRepository
-                .findByAppUser_IdOrderByCreatedAtDesc(userId, topTwenty)
-                .stream()
-                .map(this::toDto)
-                .toList();
+                .findByAppUser_IdOrderByCreatedAtDesc(userId, pageable)
+                .map(this::toDto);
 
     }
-    public List<PostDto> getUserTimeLinePosts(long userId) {
+    public Page<PostDto> getUserTimeLinePosts(long userId, Pageable pageable) {
         if (!appUserRepository.existsById(userId)) {
             throw ClientErrors.userIdNotFound(userId);
         }
-//        return postRepository.findTimelinePosts(userId).stream().map(this::toDto).toList();
-        Pageable topTwenty = PageRequest.of(0, 20);
         return postRepository
-                .findTimelinePosts(userId, topTwenty)
-                .stream()
-                .map(this::toDto)
-                .toList();
+                .findTimelinePosts(userId, pageable)
+                .map(this::toDto); // Page.map() works directly on Page<Post>
     }
     public PostDto createPost(long userId, CreatePostDto createPostDto) {
         AppUser appUser = appUserRepository.findById(userId).orElseThrow(()-> ClientErrors.userIdNotFound(userId));

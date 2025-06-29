@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findByAppUser_IdOrderByCreatedAtDesc(long AppUserId,Pageable pageable);
+    Page<Post> findByAppUser_IdOrderByCreatedAtDesc(long appUserId, Pageable pageable);
 //    @Query("SELECT p FROM Post p JOIN Following f ON p.appUser.id = f.followee.id " +
 //            "WHERE f.follower.id = :followerId ORDER BY p.createdAt DESC")
 //    List<Post> findTimelinePosts(@Param("followerId") long followerId);

@@ -13,21 +13,21 @@ export default function TimelinePosts({auth, userId}) {
 
     const [likeStatus, setLikeStatus] = useState({});
 
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+
     useEffect(() => {
         if (!userId) return;
-        fetch(api + "/appUsers/"+ userId + "/posts/timeLinePosts", {headers: basic(auth)})
-            .then(response =>{
-                if(!response.ok) throw  new Error(response.statusText);
-                return response.json();
-            }).then(result =>{
-            setPosts(result);
-        })
-            .catch(error => console.error("Error in fetching posts: ", error));
+        fetchTimelinePosts(api, auth, userId, page)
+            .then((data) => {
+                setPosts((prev) => [...prev, ...data.content]); // `content` is from Spring Page
+                setHasMore(!data.last); // indicates if more pages are available
+            })
+            .catch((error) => console.error("Error in fetching posts: ", error));
+    }, [api, auth, userId, page]);
 
 
-    },[api, userId,auth]);
 
-//
 
     useEffect(() => {
         if(posts.length > 0) {
@@ -55,8 +55,8 @@ export default function TimelinePosts({auth, userId}) {
 
                 <div className="grid">
                     {likeStatus[p.id] !== undefined &&(
-                        likeStatus[p.id] ?<button onClick={()=> unlikePost(api, auth, setLikeStatus, setLikeCounts,userId, p.id)}> UnLike </button> :
-                            <button onClick={()=> likePost(api, auth, setLikeStatus, setLikeCounts,userId, p.id)}>Like</button>
+                        likeStatus[p.id] ?<button onClick={()=> unlikePost(api, auth, setLikeStatus, setLikeCounts,userId, p.id)}> ❤️UnLike </button> :
+                            <button onClick={()=> likePost(api, auth, setLikeStatus, setLikeCounts,userId, p.id)}> 🤍 Like</button>
 
                     )}
                     <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
@@ -67,10 +67,25 @@ export default function TimelinePosts({auth, userId}) {
 
 
         </ul>
-            </>
+            {hasMore && (
+                <button onClick={() => setPage((prev) => prev + 1)}>
+                    Load More Posts.
+                </button>
+            )}
+
+        </>
     )
 
 
+}
+
+export async function fetchTimelinePosts(api, auth, userId, page = 0, size = 20) {
+    const res = await fetch(
+        `${api}/appUsers/${userId}/posts/timeLinePosts?page=${page}&size=${size}`,
+        { headers: basic(auth) }
+    );
+    if (!res.ok) throw new Error("Failed to fetch timeline posts");
+    return res.json();
 }
 export function likePost(api, auth, setLikeStatus, setLikeCounts, appUserId, postId) {
     fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", {method: "POST", headers: basic(auth)})

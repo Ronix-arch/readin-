@@ -2,6 +2,9 @@ package oth.ics.wtp.readinbackend.controllers;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +32,26 @@ import java.util.List;
    }
 
    @GetMapping(value = "appUsers/{appUserId}/posts/ownPosts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PostDto> getOwnPosts(HttpServletRequest request, @PathVariable("appUserId") long appUserId) {
+    public Page<PostDto> getOwnPosts(HttpServletRequest request,
+                                     @PathVariable("appUserId") long appUserId,
+                                     @RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "20") int size
+   ) {
        authService.getAuthenticatedUser(request);
-       return postService.getUserOwnPosts(appUserId);
+       Pageable pageable = PageRequest.of(page, size);
+       return postService.getUserOwnPosts(appUserId,pageable);
    }
 @GetMapping(value = "appUsers/{appUserId}/posts/timeLinePosts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PostDto> getTimeLinePosts(HttpServletRequest request, @PathVariable("appUserId") long appUserId) {
+    public Page<PostDto> getTimeLinePosts(
+            HttpServletRequest request,
+            @PathVariable("appUserId") long appUserId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+
+) {
        authService.getAuthenticatedUser(request);
-       return postService.getUserTimeLinePosts(appUserId);
+    Pageable pageable = PageRequest.of(page, size);
+    return postService.getUserTimeLinePosts(appUserId, pageable);
 }
     @ResponseStatus(HttpStatus.CREATED)
 @PostMapping(value ="appUsers/{appUserId}/posts",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -2,7 +2,7 @@ import {useContext, useEffect, useState} from "react";
 import {Api} from "./Context.js";
 import {basic, basicJson} from "./Headers.js";
 import CreatePostcreation from "./Userpostcreation.jsx";
-import  {likePost, unlikePost, hasUserLikedPost, numberOfLikePost} from "./TimelinePosts.jsx";
+import {likePost, unlikePost, hasUserLikedPost, numberOfLikePost} from "./TimelinePosts.jsx";
 
 
 export default function UserProfilePosts({auth, userId}) {
@@ -12,20 +12,25 @@ export default function UserProfilePosts({auth, userId}) {
     const [editPostContent, setEditPostContent] = useState("");
     const [likeCounts, setLikeCounts] = useState({});  // IT TRACKS THE LIKES
     const [likeStatus, setLikeStatus] = useState({});
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const[numberOfPosts, setNumberOfPosts] = useState(0); // to track the number of posts
 
     useEffect(() => {
         if (!userId) return;
-        fetch(api + "/appUsers/"+ userId + "/posts/ownPosts", {headers: basic(auth)})
-            .then(response =>{
-                if(!response.ok) throw  new Error(response.statusText);
-                return response.json();
-            }).then(result =>{
-            setPosts(result);
-        })
-            .catch(error => console.error("Error in fetching posts: ", error));
+        fetchUsersOwnPosts(api, auth, userId, page)
+            .then((data) => {
+                setPosts((prev) => [...prev, ...data.content]); // `content` is from Spring Page
+                setHasMore(!data.last); // indicates if more pages are available
+                setNumberOfPosts(data.totalElements); // Set the total number of posts
+            })
+            .catch((error) => console.error("Error in fetching posts: ", error));
+    }, [api, auth, userId, page]);
 
 
-    },[api, auth,userId]);
+
+
+
 
 
 // to make sure the number of likes is fetched after the posts load.
@@ -69,9 +74,10 @@ export default function UserProfilePosts({auth, userId}) {
 if (userId=== auth.id) {
     return (
         <>
+            <h2> Your have created sofar {numberOfPosts} Posts  </h2>
 
             <CreatePostcreation auth={auth} updatePosts={setPosts}/>
-            <h2> User profile(own) Posts </h2>
+            <h2> User profile(own) Posts 💬 </h2>
             <ul>
                 {posts.map((p) => (
                     <li key={p.id}>
@@ -93,6 +99,11 @@ if (userId=== auth.id) {
                     </li>
                 ))}
             </ul>
+            {hasMore && (
+                <button onClick={() => setPage((prev) => prev + 1)}>
+                    Load More Posts.
+                </button>
+            )}
         </>
 
 
@@ -126,6 +137,11 @@ if (userId=== auth.id) {
                     </li>
                 ))}
             </ul>
+            {hasMore && (
+                <button onClick={() => setPage((prev) => prev + 1)}>
+                    Load More Posts.
+                </button>
+            )}
         </>
 
 
@@ -133,4 +149,10 @@ if (userId=== auth.id) {
 }
 
 
+}
+export async function fetchUsersOwnPosts(api, auth, userId, page = 0, size = 20) {
+    const res = await fetch(
+        `${api}/appUsers/${userId}/posts/ownPosts?page=${page}&size=${size}`, { headers: basic(auth) });
+    if (!res.ok) throw new Error("Failed to fetch ownposts");
+    return res.json();
 }
