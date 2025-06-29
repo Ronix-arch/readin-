@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: asdf1234
+    volumes:
+      - ./db-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "mariadb-admin" ,"ping", "-h", "localhost", "--password=asdf1234"]
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 7070:8080
+    depends_on:
+      db:
+        condition: service_healthy
+  backend:
+    image: readin/backend
+    restart: always
+    build:
+      context: ../readin-backend
+    ports:
+      - 8080:8080
+    depends_on:
+      db:
+        condition: service_healthy
+  frontend:
+    image: readin/frontend
+    restart: always
+    build:
+      context: ../readin-frontend
+      args:
+        - READIN_API=${READIN_API}
+    ports:
+      - 80:80
+    depends_on:
+      - backend
