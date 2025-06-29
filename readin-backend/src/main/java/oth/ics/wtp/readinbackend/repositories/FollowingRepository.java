@@ -5,9 +5,11 @@ import org.springframework.stereotype.Repository;
 import oth.ics.wtp.readinbackend.entities.Following;
 
 import java.util.List;
-@Repository    //some work to do
+
+@Repository
 public interface FollowingRepository extends JpaRepository<Following, Long> {
     boolean existsByFollowerIdAndFolloweeId(long followerId, long followeeId);
+
     List<Following> findByFollowerId(long followerId);
 
     void deleteByFollowerIdAndFolloweeId(long followerId, long followeeId);

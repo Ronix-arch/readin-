@@ -8,20 +8,25 @@ import java.util.List;
 
 import static jakarta.persistence.FetchType.EAGER;
 
-@Entity public class AppUser {
-    @Id @GeneratedValue
+@Entity
+public class AppUser {
+    @Id
+    @GeneratedValue
     private Long id;
-   @Column(unique=true) private String name;
-    private  String hashedPassword;
+    @Column(unique = true)
+    private String name;
+    private String hashedPassword;
     private Instant createdAt;
     @OneToMany(mappedBy = "followee")
     private List<Following> followers; // Users who follow this user
 
     @OneToMany(mappedBy = "follower")
     private List<Following> followings; // Users this user follows
-    @OneToMany (fetch = EAGER) private List<Post> appUserPosts;
+    @OneToMany(fetch = EAGER)
+    private List<Post> appUserPosts;
 
-    public AppUser() {}
+    public AppUser() {
+    }
 
     public AppUser(String name, String hashedPassword) {
         this.name = name;
@@ -33,7 +38,7 @@ import static jakarta.persistence.FetchType.EAGER;
     }
 
     public List<Following> getFollowers() {
-        return followers ;
+        return followers;
     }
 
     public void setFollowers(List<Following> followers) {
@@ -52,16 +57,16 @@ import static jakarta.persistence.FetchType.EAGER;
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<Post> getAppUserPosts() {
         return appUserPosts;
     }
 
     public void setAppUserPosts(List<Post> appUserPosts) {
         this.appUserPosts = appUserPosts;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getHashedPassword() {

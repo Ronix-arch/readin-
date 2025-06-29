@@ -8,16 +8,24 @@ import java.time.Instant;
 import static org.hibernate.annotations.OnDeleteAction.CASCADE;
 
 @Entity
-@Table(name = "likes",uniqueConstraints = {
-@UniqueConstraint( name = "uniquepostuser",columnNames = {"app_user_id","post_id"})})
+@Table(name = "likes", uniqueConstraints = {@UniqueConstraint(name = "uniquepostuser", columnNames = {"app_user_id", "post_id"})})
 public class Like {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
-    @ManyToOne @JoinColumn(name = "app_user_id") @OnDelete(action = CASCADE) private AppUser appUser;
-    @ManyToOne @JoinColumn(name = "post_id") @OnDelete (action = CASCADE) private Post post;
+    @ManyToOne
+    @JoinColumn(name = "app_user_id")
+    @OnDelete(action = CASCADE)
+    private AppUser appUser;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    @OnDelete(action = CASCADE)
+    private Post post;
     private Instant createdAt;
 
-    public Like() {}
+    public Like() {
+    }
+
     public Like(AppUser appUser, Post post) {
         this.appUser = appUser;
         this.post = post;

@@ -9,22 +9,21 @@ import java.util.List;
 
 import static org.hibernate.annotations.OnDeleteAction.CASCADE;
 
-@Entity public class Post {
-    @Id @GeneratedValue
+@Entity
+public class Post {
+    @Id
+    @GeneratedValue
     private Long id;
     private String content;
     private Instant createdAt;
     @ManyToOne
     @JoinColumn(name = "app_user_id")  // Ensure the correct column is mapp
 
-    @OnDelete (action = CASCADE)
+    @OnDelete(action = CASCADE)
     private AppUser appUser;
 
-  //  @JoinColumn(name = "post_id")  // Specify the foreign key column it refused
-   // @OnDelete (action = CASCADE) private List<Like> likes;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
-
 
 
     public Post() {

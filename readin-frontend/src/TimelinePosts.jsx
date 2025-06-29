@@ -1,7 +1,6 @@
 import {useContext, useEffect, useState} from "react";
 import {Api} from "./Context.js";
 import {basic} from "./Headers.js";
-import CreatePostcreation from "./Userpostcreation.jsx"; // i might leave it out not so important.
 
 export default function TimelinePosts({auth, userId}) {
     const api = useContext(Api);
@@ -27,36 +26,28 @@ export default function TimelinePosts({auth, userId}) {
     }, [api, auth, userId, page]);
 
 
-
-
     useEffect(() => {
-        if(posts.length > 0) {
-            posts.forEach(post => hasUserLikedPost(api,auth,setLikeStatus,userId, post.id));
-            posts.forEach(post => numberOfLikePost(api,auth,setLikeCounts,post.id));
+        if (posts.length > 0) {
+            posts.forEach(post => hasUserLikedPost(api, auth, setLikeStatus, userId, post.id));
+            posts.forEach(post => numberOfLikePost(api, auth, setLikeCounts, post.id));
         }//  to Ensure like count is fetched after posts load
-    }, [ posts]);
-    
+    }, [posts]);
 
 
-
-
-
-    
-
-    return (
-        <>
-            <h2> Your Followees' Posts  💬</h2>
+    return (<>
+            <h2> Your Followees' Posts 💬</h2>
             {/*<CreatePostcreation auth = {auth} updatePosts={setPosts()} /> How to solve this problem */}
-        <ul>{posts.map( p =>
-            <li key ={p.id}>
+            <ul>{posts.map(p => <li key={p.id}>
                 <h5>@{p.userName}</h5>
                 <p>{p.content}</p>
-                <p>Posted on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
+                <p>Posted
+                    on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
 
                 <div className="grid">
-                    {likeStatus[p.id] !== undefined &&(
-                        likeStatus[p.id] ?<button onClick={()=> unlikePost(api, auth, setLikeStatus, setLikeCounts,userId, p.id)}> ❤️UnLike </button> :
-                            <button onClick={()=> likePost(api, auth, setLikeStatus, setLikeCounts,userId, p.id)}> 🤍 Like</button>
+                    {likeStatus[p.id] !== undefined && (likeStatus[p.id] ? <button
+                                onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> ❤️UnLike </button> :
+                            <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> 🤍
+                                Like</button>
 
                     )}
                     <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
@@ -64,62 +55,57 @@ export default function TimelinePosts({auth, userId}) {
             </li>)}
 
 
-
-
-        </ul>
-            {hasMore && (
-                <button onClick={() => setPage((prev) => prev + 1)}>
+            </ul>
+            {hasMore && (<button onClick={() => setPage((prev) => prev + 1)}>
                     Load More Posts.
-                </button>
-            )}
+                </button>)}
 
-        </>
-    )
+        </>)
 
 
 }
 
 export async function fetchTimelinePosts(api, auth, userId, page = 0, size = 20) {
-    const res = await fetch(
-        `${api}/appUsers/${userId}/posts/timeLinePosts?page=${page}&size=${size}`,
-        { headers: basic(auth) }
-    );
+    const res = await fetch(`${api}/appUsers/${userId}/posts/timeLinePosts?page=${page}&size=${size}`, {headers: basic(auth)});
     if (!res.ok) throw new Error("Failed to fetch timeline posts");
     return res.json();
 }
+
 export function likePost(api, auth, setLikeStatus, setLikeCounts, appUserId, postId) {
     fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", {method: "POST", headers: basic(auth)})
         .then(response => {
             if (!response.ok) throw new Error(response.statusText);
-            setLikeStatus(prev => ({ ...prev, [postId]: true }));
-            setLikeCounts(prev => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
+            setLikeStatus(prev => ({...prev, [postId]: true}));
+            setLikeCounts(prev => ({...prev, [postId]: (prev[postId] || 0) + 1}));
         })
         .catch(error => console.error("Error in liking  post: ", error));
 }
 
- export function unlikePost(api, auth, setLikeStatus, setLikeCounts, appUserId, postId) {
+export function unlikePost(api, auth, setLikeStatus, setLikeCounts, appUserId, postId) {
     fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", {method: "DELETE", headers: basic(auth)})
         .then(response => {
             if (!response.ok) throw new Error(response.statusText);
-            setLikeStatus(prev => ({ ...prev, [postId]: false }));
-            setLikeCounts(prev => ({ ...prev, [postId]: Math.max((prev[postId] || 0) - 1, 0) }));
+            setLikeStatus(prev => ({...prev, [postId]: false}));
+            setLikeCounts(prev => ({...prev, [postId]: Math.max((prev[postId] || 0) - 1, 0)}));
         })
         .catch(error => console.error("Error in unliking  post: ", error));
 }
-export function hasUserLikedPost (api,auth,setLikeStatus,appUserId, postId) {
-    fetch(api + "/appUsers/"+appUserId +"/posts/"+postId+"/like", {headers: basic(auth)})
-        .then(response =>{
-            if(!response.ok) throw  new Error(response.statusText);
+
+export function hasUserLikedPost(api, auth, setLikeStatus, appUserId, postId) {
+    fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", {headers: basic(auth)})
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
             return response.json();
         }).then(hasUserLikedPost => {
         setLikeStatus(prev => ({...prev, [postId]: hasUserLikedPost}));
     })
-        .catch(error => console.error("Error in checking like status",error));
+        .catch(error => console.error("Error in checking like status", error));
 }
- export function numberOfLikePost (api,auth,setLikeCounts,postId) {
-    fetch(api + "/appUsers/posts/"+ postId +"/likeCount",{headers: basic(auth)})
-        .then(response =>{
-            if(!response.ok) throw  new Error(response.statusText);
+
+export function numberOfLikePost(api, auth, setLikeCounts, postId) {
+    fetch(api + "/appUsers/posts/" + postId + "/likeCount", {headers: basic(auth)})
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
             return response.json();
         }).then(likeCount => {
         setLikeCounts(prev => ({...prev, [postId]: likeCount}));

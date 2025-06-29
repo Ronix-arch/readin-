@@ -12,40 +12,44 @@ import oth.ics.wtp.readinbackend.services.FollowingService;
 
 import java.util.List;
 
-@SecurityRequirement(name ="basicAuth")
+@SecurityRequirement(name = "basicAuth")
 @RestController
 public class FollowingController {
     private final AuthService authService;
     private final FollowingService followingService;
 
-   @Autowired
-   public FollowingController(AuthService authService, FollowingService followingService) {
+    @Autowired
+    public FollowingController(AuthService authService, FollowingService followingService) {
         this.authService = authService;
         this.followingService = followingService;
     }
+
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "appUsers/{followerId}/following/{followeeId}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "appUsers/{followerId}/following/{followeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void followUser(HttpServletRequest request, @PathVariable("followerId") long followerId, @PathVariable("followeeId") long followeeId) {
         authService.getAuthenticatedUser(request);
         followingService.followUser(followerId, followeeId);
     }
+
     @DeleteMapping(value = "appUsers/{followerId}/following/{followeeId}")
-    public void unfollowUser(HttpServletRequest request,@PathVariable("followerId") long followerId, @PathVariable("followeeId") long followeeId) {
+    public void unfollowUser(HttpServletRequest request, @PathVariable("followerId") long followerId, @PathVariable("followeeId") long followeeId) {
         authService.getAuthenticatedUser(request);
         followingService.unfollowUser(followerId, followeeId);
     }
-    @GetMapping(value = "appUsers/{followerId}/following/{followeeId}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean isFollowing(HttpServletRequest request,@PathVariable long followerId, @PathVariable long followeeId) {
+
+    @GetMapping(value = "appUsers/{followerId}/following/{followeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean isFollowing(HttpServletRequest request, @PathVariable long followerId, @PathVariable long followeeId) {
         authService.getAuthenticatedUser(request);
         return followingService.isFollowing(followerId, followeeId);
     }
-    @GetMapping(value = "appUsers/{appUserId}/following/followers",produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @GetMapping(value = "appUsers/{appUserId}/following/followers", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AppUserDto> getFollowers(HttpServletRequest request, @PathVariable long appUserId) {
-       authService.getAuthenticatedUser(request);
-       return followingService.getFollowers(appUserId);
+        authService.getAuthenticatedUser(request);
+        return followingService.getFollowers(appUserId);
     }
 
-    @GetMapping(value = "appUsers/{appUserId}/following/followees",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "appUsers/{appUserId}/following/followees", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AppUserDto> getFollowees(HttpServletRequest request, @PathVariable long appUserId) {
         authService.getAuthenticatedUser(request);
         return followingService.getFollowings(appUserId);

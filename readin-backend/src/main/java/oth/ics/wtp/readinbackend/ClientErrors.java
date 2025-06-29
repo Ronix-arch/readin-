@@ -1,4 +1,5 @@
 package oth.ics.wtp.readinbackend;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ public class ClientErrors {
     public static ResponseStatusException userNotFound(String name) {
         return log(new ResponseStatusException(HttpStatus.NOT_FOUND, "user with name " + name));
     }
+
     public static ResponseStatusException userNameTaken(String name) {
         return log(new ResponseStatusException(HttpStatus.BAD_REQUEST, "user name already taken: " + name));
     }
@@ -37,13 +39,14 @@ public class ClientErrors {
     }
 
     public static ResponseStatusException followingAlreadyExsists(long followerId, long followeeId) {
-        return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the Following relationship between followerid  " + followerId + " and followeid " + followeeId+" already exists" ));
+        return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the Following relationship between followerid  " + followerId + " and followeid " + followeeId + " already exists"));
     }
 
     public static ResponseStatusException followingDoesNotExsists(long followerId, long followeeId) {
-        return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the Following relationship between followerid  " + followerId + " and followeid " + followeeId+" does not exists" ));
+        return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the Following relationship between followerid  " + followerId + " and followeid " + followeeId + " does not exists"));
     }
-    public static ResponseStatusException userAlreadyLikedPost(long appUserId,long postId) {
-        return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the User withe appUserId  " + appUserId + " has already liked the post with the postId  " + postId ));
+
+    public static ResponseStatusException userAlreadyLikedPost(long appUserId, long postId) {
+        return log(new ResponseStatusException(HttpStatus.ALREADY_REPORTED, "the User withe appUserId  " + appUserId + " has already liked the post with the postId  " + postId));
     }
 }
