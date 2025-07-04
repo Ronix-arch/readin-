@@ -7,7 +7,6 @@ import {hasUserLikedPost, likePost, numberOfLikePost, unlikePost} from "./Timeli
 
 export default function UserProfilePosts({auth, userId}) {
     const api = useContext(Api);
-    // const userId = auth.id;
     const [posts, setPosts] = useState([]);
     const [editPostContent, setEditPostContent] = useState("");
     const [likeCounts, setLikeCounts] = useState({});  // IT TRACKS THE LIKES
@@ -113,9 +112,9 @@ export default function UserProfilePosts({auth, userId}) {
 
                                 <div className="grid">
                                     {likeStatus[p.id] !== undefined && (likeStatus[p.id] ? <button
-                                                onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}> UnLike </button> :
+                                                onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}> ❤️ UnLike </button> :
                                             <button
-                                                onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}>Like</button>
+                                                onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}>🤍 Like</button>
 
                                     )}
                                     <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>

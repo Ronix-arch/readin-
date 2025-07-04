@@ -22,7 +22,7 @@ services:
     image: readin/backend
     restart: always
     build:
-      context: ../readin-backend
+      context: ./readin-backend
     ports:
       - 8080:8080
     depends_on:
@@ -32,7 +32,7 @@ services:
     image: readin/frontend
     restart: always
     build:
-      context: ../readin-frontend
+      context: ./readin-frontend
       args:
         - READIN_API=${READIN_API}
     ports:

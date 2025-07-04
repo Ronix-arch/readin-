@@ -7,7 +7,7 @@ RUN mvn package
 
 
 FROM eclipse-temurin:21-jre
-COPY --from=build /build/target/readin-backend-1.jar /app/readin-backend-1.jar
+COPY --from=build /build/target/readin-backend-0.0.1-SNAPSHOT.jar /app/readin-backend-1.jar
 WORKDIR /app/
 EXPOSE 8080
 ENTRYPOINT ["java", "-Dspring.datasource.url=jdbc:mariadb://db:3306/readin?createDatabaseIfNotExist=true", "-jar", "readin-backend-1.jar"]
