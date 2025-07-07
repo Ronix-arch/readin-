@@ -30,12 +30,11 @@ export default function Login({auth, setAuth}) {
             headers: basic(newAuth)
         })
             .then(response => {
-                if (response.ok) {
-                    // If the response is OK, parse it as JSON
-                    return response.json();
-                } else {
+                if (!response.ok) {
+                    window.alert( "Login failed: Either the User name or the password is not correct " + response.statusText);
                     throw new Error(response.statusText);
                     }
+                return response.json();
 
             })
             .then(result => {
