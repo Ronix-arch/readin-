@@ -1,0 +1,18 @@
+body {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+nav ul li a.current {
+  text-decoration: underline;
+}
+
+button.delete {
+  background-color: red;
+  border-color: red;
+  color: white;
+}
+
+button {
+  margin-bottom: var(--pico-spacing);
+}
