@@ -4,7 +4,10 @@ Readin is  Microblogging  web-application  based on spring boot in the backend a
 
 
 
-## Extra features Implemented 
+## features Implemented 
+in this app, one can 
+* create, edit and delete his own posts
+* follow other users and see there posts 
 * Un-liking posts currently liked by the user
 * Deleting one’s own posts (in profile tab)
 * Managing one’s own user profile (it displays the name ,number of posts created sofar, number of followers, number of followees, Also in the User Profile , one can create, update, and delete their posts)
