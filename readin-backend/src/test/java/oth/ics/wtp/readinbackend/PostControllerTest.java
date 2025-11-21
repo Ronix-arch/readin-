@@ -9,7 +9,6 @@ import oth.ics.wtp.readinbackend.controllers.AppUserController;
 import oth.ics.wtp.readinbackend.controllers.FollowingController;
 import oth.ics.wtp.readinbackend.controllers.PostController;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
-import oth.ics.wtp.readinbackend.dtos.CreatePostDto;
 import oth.ics.wtp.readinbackend.dtos.PostDto;
 import oth.ics.wtp.readinbackend.dtos.UpdatePostDto;
 
@@ -44,9 +43,9 @@ public class PostControllerTest extends ReadinControllerTestBase {
 
     @Test
     public void testCreatePostAndListPosts() {
-        postController.createPost(user0(), appUserId, new CreatePostDto("post1OfUser1"));
-        postController.createPost(user0(), appUserId, new CreatePostDto("post2OfUser1"));
-        postController.createPost(user0(), appUserId, new CreatePostDto("post3OfUser1"));
+        postController.createPost(user0(), appUserId, "post1OfUser1", null);
+        postController.createPost(user0(), appUserId, "post2OfUser1", null);
+        postController.createPost(user0(), appUserId, "post3OfUser1", null);
         List<PostDto> posts = postController.getOwnPosts(user0(), appUserId, 0, 20).toList();
         assertEquals(3, posts.size());
         assertTrue(posts.stream().anyMatch(p -> p.content().equals("post1OfUser1")));
@@ -55,7 +54,7 @@ public class PostControllerTest extends ReadinControllerTestBase {
 
     @Test
     public void testUpdatePost() {
-        long postId = postController.createPost(user0(), appUserId, new CreatePostDto("post1OfUser1")).id();
+        long postId = postController.createPost(user0(), appUserId, "post1OfUser1", null).id();
         PostDto postDto = postController.updatePost(user0(), appUserId, postId, new UpdatePostDto("updatedPost1OfUser1"));
         assertEquals("updatedPost1OfUser1", postDto.content());
         assertThrows(ResponseStatusException.class, () -> postController.updatePost(user0(), 34, postId, new UpdatePostDto("updatedPost2OfUser1")));
@@ -65,7 +64,7 @@ public class PostControllerTest extends ReadinControllerTestBase {
 
     @Test
     public void testDeletePost() {
-        long postId = postController.createPost(user0(), appUserId, new CreatePostDto("post1OfUser1")).id();
+        long postId = postController.createPost(user0(), appUserId, "post1OfUser1", null).id();
         postController.deletePost(user0(), appUserId, postId);
         assertThrows(ResponseStatusException.class, () -> postController.deletePost(user0(), appUserId, postId));
 
@@ -77,8 +76,8 @@ public class PostControllerTest extends ReadinControllerTestBase {
         long followee2Id = appUserController.createAppUser(new CreateAppUserDto("followee2", "password3")).id();
         followingController.followUser(user0(), appUserId, followee1Id);
         followingController.followUser(user0(), appUserId, followee2Id);
-        postController.createPost(user0(), followee1Id, new CreatePostDto("post1OfFollowee1"));
-        postController.createPost(user0(), followee2Id, new CreatePostDto("post1OfFollowee2"));
+        postController.createPost(user0(), followee1Id, "post1OfFollowee1", null);
+        postController.createPost(user0(), followee2Id, "post1OfFollowee2", null);
 
         List<PostDto> timelinePosts = postController.getTimeLinePosts(user0(), appUserId, 0, 20).toList();
         assertFalse(timelinePosts.isEmpty());

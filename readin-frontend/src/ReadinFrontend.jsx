@@ -24,17 +24,11 @@ export default function ReadinFrontend() {
     };
 
     return <>
-        <header>
-            <h2>ReadIn 🎭</h2>
-            <nav
-                aria-label="breadcrumb"
-                style={{
-                    "--pico-nav-breadcrumb-divider": "'✨'", display: "flex", justifyContent: "flex-end"
-
-                }}
-            >
-
-
+        <header className="container">
+            <nav>
+                <ul>
+                    <li><strong>ReadIn 🎭</strong></li>
+                </ul>
                 <ul>
                     <li><a href="#" className={view === "timeline" ? "current" : "default"}
                            onClick={() => setView("timeline")}>Timeline</a></li>
@@ -47,10 +41,9 @@ export default function ReadinFrontend() {
                            onClick={() => setView("login")}>
                         {auth.loggedIn ? "Log out" : "Log in"}</a></li>
                 </ul>
-
             </nav>
         </header>
-        <main>
+        <main className="container">
             {view === "timeline" ? <TimelinePosts auth={auth} userId={auth.id}/> : view === "users" ?
                 <Users auth={auth} onNavigateToProfile={handleNavigateToProfile}/> : view === "userProfile" ?
                     <UserProfile
@@ -64,7 +57,7 @@ export default function ReadinFrontend() {
                     /> : <Login auth={auth} setAuth={setAuth}/>}
 
         </main>
-        <footer>
+        <footer className="container">
             <p> Express Yourself. The Space is yours @ Readin </p>
             <p><small> Summer 2025, Web Technology Project, International Computer Science, OTH Regensburg</small></p>
         </footer>
@@ -73,5 +66,3 @@ export default function ReadinFrontend() {
 
 
 }
-
-

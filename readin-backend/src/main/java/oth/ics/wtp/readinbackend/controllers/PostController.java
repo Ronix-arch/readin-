@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import oth.ics.wtp.readinbackend.dtos.CreatePostDto;
+import org.springframework.web.multipart.MultipartFile;
 import oth.ics.wtp.readinbackend.dtos.PostDto;
 import oth.ics.wtp.readinbackend.dtos.UpdatePostDto;
 import oth.ics.wtp.readinbackend.services.AuthService;
@@ -44,10 +44,10 @@ public class PostController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "appUsers/{appUserId}/posts", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PostDto createPost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @RequestBody CreatePostDto createPostDto) {
+    @PostMapping(value = "appUsers/{appUserId}/posts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PostDto createPost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @RequestParam("content") String content, @RequestParam(value = "file", required = false) MultipartFile file) {
         authService.getAuthenticatedUser(request);
-        return postService.createPost(appUserId, createPostDto);
+        return postService.createPost(appUserId, content, file);
     }
 
     @PutMapping(value = "appUsers/{appUserId}/posts/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

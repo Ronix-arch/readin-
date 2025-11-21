@@ -36,26 +36,35 @@ export default function TimelinePosts({auth, userId}) {
 
     return (<>
             <h2> Your Followees' Posts 💬</h2>
-            {/*<CreatePostcreation auth = {auth} updatePosts={setPosts()} /> How to solve this problem */}
-            <ul>{posts.map(p => <li key={p.id}>
-                <h5>@{p.userName}</h5>
-                <p>{p.content}</p>
-                <p>Posted
-                    on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
-
-                <div className="grid">
-                    {likeStatus[p.id] !== undefined && (likeStatus[p.id] ? <button
-                                onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> ❤️UnLike </button> :
-                            <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> 🤍
-                                Like</button>
-
+            {posts.map(p => (
+                <article key={p.id}>
+                    <header>
+                        <h5>@{p.userName}</h5>
+                    </header>
+                    <p>{p.content}</p>
+                    {p.attachmentUrl && (
+                        p.attachmentType.startsWith("image/") ? (
+                            <img src={`${api}/files/${p.attachmentUrl}`} alt="Post attachment" style={{maxWidth: "100%"}}/>
+                        ) : p.attachmentType.startsWith("video/") ? (
+                            <video src={`${api}/files/${p.attachmentUrl}`} controls style={{maxWidth: "100%"}}/>
+                        ) : null
                     )}
-                    <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
-                </div>
-            </li>)}
+                    <footer>
+                        <p>Posted
+                            on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
 
+                        <div className="grid">
+                            {likeStatus[p.id] !== undefined && (likeStatus[p.id] ?
+                                <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> ❤️UnLike </button> :
+                                <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> 🤍
+                                    Like</button>
 
-            </ul>
+                            )}
+                            <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
+                        </div>
+                    </footer>
+                </article>
+            ))}
             {hasMore && (<button onClick={() => setPage((prev) => prev + 1)}>
                     Load More Posts.
                 </button>)}
@@ -112,4 +121,3 @@ export function numberOfLikePost(api, auth, setLikeCounts, postId) {
     })
         .catch(error => console.error("Error in getting no of likes of a post: ", error));
 }
-

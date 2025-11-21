@@ -71,9 +71,17 @@ export default function UserProfilePosts({auth, userId}) {
 
                 <CreatePostcreation auth={auth} updatePosts={setPosts}/>
                 <h2> User profile(own) Posts 💬 </h2>
-                <ul>
-                    {posts.map((p) => (<li key={p.id}>
-                            <p>{p.content}</p>
+                {posts.map((p) => (
+                    <article key={p.id}>
+                        <p>{p.content}</p>
+                        {p.attachmentUrl && (
+                            p.attachmentType.startsWith("image/") ? (
+                                <img src={`${api}/files/${p.attachmentUrl}`} alt="Post attachment" style={{maxWidth: "100%"}}/>
+                            ) : p.attachmentType.startsWith("video/") ? (
+                                <video src={`${api}/files/${p.attachmentUrl}`} controls style={{maxWidth: "100%"}}/>
+                            ) : null
+                        )}
+                        <footer>
                             <p>Posted
                                 on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
                             <p>Number of Likes 👍: {likeCounts[p.id] || 0}</p>
@@ -86,10 +94,9 @@ export default function UserProfilePosts({auth, userId}) {
                                 <button onClick={() => updateuserposts(userId, p.id)}>Update Post</button>
                                 <button onClick={() => deletePost(userId, p.id)}>Delete Post</button>
                             </div>
-
-
-                        </li>))}
-                </ul>
+                        </footer>
+                    </article>
+                ))}
                 {hasMore && (<button onClick={() => setPage((prev) => prev + 1)}>
                         Load More Posts.
                     </button>)}
@@ -102,28 +109,34 @@ export default function UserProfilePosts({auth, userId}) {
         return (<>
 
                 <h2> User profile(own) Posts </h2>
-                <ul>
-                    {posts.map((p) => (<li key={p.id}>
-                            <p>{p.content}</p>
+                {posts.map((p) => (
+                    <article key={p.id}>
+                        <p>{p.content}</p>
+                        {p.attachmentUrl && (
+                            p.attachmentType.startsWith("image/") ? (
+                                <img src={`${api}/files/${p.attachmentUrl}`} alt="Post attachment" style={{maxWidth: "100%"}}/>
+                            ) : p.attachmentType.startsWith("video/") ? (
+                                <video src={`${api}/files/${p.attachmentUrl}`} controls style={{maxWidth: "100%"}}/>
+                            ) : null
+                        )}
+                        <footer>
                             <p>Posted
                                 on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
 
                             <div className="grid">
 
                                 <div className="grid">
-                                    {likeStatus[p.id] !== undefined && (likeStatus[p.id] ? <button
-                                                onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}> ❤️ UnLike </button> :
-                                            <button
-                                                onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}>🤍 Like</button>
+                                    {likeStatus[p.id] !== undefined && (likeStatus[p.id] ?
+                                        <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}> ❤️ UnLike </button> :
+                                        <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}>🤍 Like</button>
 
                                     )}
                                     <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
                                 </div>
                             </div>
-
-
-                        </li>))}
-                </ul>
+                        </footer>
+                    </article>
+                ))}
                 {hasMore && (<button onClick={() => setPage((prev) => prev + 1)}>
                         Load More Posts.
                     </button>)}

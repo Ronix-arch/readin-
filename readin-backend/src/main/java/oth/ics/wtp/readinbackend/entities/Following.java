@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 
-@Table(name = "following", uniqueConstraints = {@UniqueConstraint(name = "unique_follower_followee", columnNames = {"follower", "followee"})})
+@Table(name = "following", uniqueConstraints = {@UniqueConstraint(name = "unique_follower_followee", columnNames = {"follower_id", "followee_id"})})
 
 @Entity
 public class Following {

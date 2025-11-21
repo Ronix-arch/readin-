@@ -15,6 +15,8 @@ public class Post {
     @GeneratedValue
     private Long id;
     private String content;
+    private String attachmentUrl;
+    private String attachmentType;
     private Instant createdAt;
     @ManyToOne
     @JoinColumn(name = "app_user_id")  // Ensure the correct column is mapp
@@ -58,6 +60,22 @@ public class Post {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getAttachmentUrl() {
+        return attachmentUrl;
+    }
+
+    public void setAttachmentUrl(String attachmentUrl) {
+        this.attachmentUrl = attachmentUrl;
+    }
+
+    public String getAttachmentType() {
+        return attachmentType;
+    }
+
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
     }
 
     public Instant getCreatedAt() {

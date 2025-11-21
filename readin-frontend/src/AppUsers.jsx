@@ -7,9 +7,8 @@ export default function Users({auth}) {
     const userId = auth.id;
     const [users, setUsers] = useState([]);
     const [followingStatus, setFollowingStatus] = useState({});
-    const [newUserName, setNewUserName] = useState("");
-    const [newSearchedUser, setNewSearchedUser] = useState({});
-    const [isOpen, setIsOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
 
 
     useEffect(() => {
@@ -63,21 +62,24 @@ export default function Users({auth}) {
 
     }
 
-    function findUserByUsername(searchedusername) {
-        fetch(api + "/appUsers/" + searchedusername, {method: "GET", headers: basic(auth)})
+    function searchUsers(query) {
+        if (!query) {
+            setSearchResults([]);
+            return;
+        }
+        fetch(api + "/appUsers?query=" + query, {headers: basic(auth)})
             .then(response => {
-                if (!response.ok) throw new Error(response.statusText);
-                return response.json();
-
+                if (response.ok) return response.json(); else throw new Error(response.statusText);
             }).then(result => {
-            setNewSearchedUser(result);
-            setIsOpen(!isOpen);  // the proble is the same button can be the searche user disappear
-        }).catch(error => console.error("Error finding user:", error));
-
+            const filteredResults = result.filter(user => user.id !== auth.id);
+            setSearchResults(filteredResults);
+            filteredResults.forEach(user => isFollowing(auth.id, user.id));
+        }).catch(error => console.error("Error searching for users:", error));
     }
 
     function handleInputChange(event) {
-        setNewUserName(event.target.value);
+        setSearchQuery(event.target.value);
+        searchUsers(event.target.value);
     }
 
 
@@ -86,23 +88,31 @@ export default function Users({auth}) {
                 <p>Search User by User Name 🔍 </p>
                 <input
                     type="text"
-                    placeholder="Write here the full username ✍️"
-                    value={newUserName}
+                    placeholder="Search for users..."
+                    value={searchQuery}
                     onChange={handleInputChange}
                 />
-                <button onClick={() => findUserByUsername(newUserName)}>Search User</button>
 
-                {isOpen && (<div className="grid">
-                        <p>{newSearchedUser.name}</p>
-                        {followingStatus[newSearchedUser.id] !== undefined && (followingStatus[newSearchedUser.id] ? (
-                                <button onClick={() => unfollowuser(userId, newSearchedUser.id)}>Unfollow</button>) : (
-                                <button onClick={() => followuser(userId, newSearchedUser.id)}>follow</button>))}
-
-
+                {searchResults.length > 0 && (
+                    <div>
+                        <h5>Search Results:</h5>
+                        <ul>
+                            {searchResults.map(u => (
+                                <li key={u.id}>
+                                    <div className="grid">
+                                        <p>{u.name}</p>
+                                        {followingStatus[u.id] !== undefined && (followingStatus[u.g] ? (
+                                            <button onClick={() => unfollowuser(userId, u.id)}>Unfollow</button>
+                                        ) : (
+                                            <button onClick={() => followuser(userId, u.id)}>Follow</button>
+                                        ))}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
-
-
                 )}
+
                 <div>
                     Users You can follow:
                 </div>

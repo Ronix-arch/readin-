@@ -28,9 +28,13 @@ public class AppUserController {
 
     @SecurityRequirement(name = "basicAuth")
     @GetMapping(value = "appUsers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<AppUserDto> getAppUsers(HttpServletRequest request) {
+    public List<AppUserDto> getAppUsers(HttpServletRequest request, @RequestParam(required = false) String query) {
         authService.getAuthenticatedUser(request);
-        return appUserService.appUsersList();
+        if (query != null && !query.isEmpty()) {
+            return appUserService.search(query);
+        } else {
+            return appUserService.appUsersList();
+        }
     }
 
     @ResponseStatus(HttpStatus.CREATED)

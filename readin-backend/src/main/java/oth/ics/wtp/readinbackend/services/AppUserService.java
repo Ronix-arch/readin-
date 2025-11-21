@@ -16,19 +16,21 @@ import java.util.List;
 public class AppUserService {
     private final AppUserRepository appUserRepository;
 
-    @Autowired public AppUserService(AppUserRepository appUserRepository) {
+    @Autowired
+    public AppUserService(AppUserRepository appUserRepository) {
         this.appUserRepository = appUserRepository;
     }
 
-    public List<AppUserDto> appUsersList(){
+    public List<AppUserDto> appUsersList() {
         return appUserRepository.findAll().stream().map(this::toDto).toList();
+    }
 
-
+    public List<AppUserDto> search(String query) {
+        return appUserRepository.findByNameContainingIgnoreCase(query).stream().map(this::toDto).toList();
     }
 
     private AppUserDto toDto(AppUser appUser) {
-
-        return new AppUserDto(appUser.getId(),appUser.getName(),appUser.getCreatedAt());
+        return new AppUserDto(appUser.getId(), appUser.getName(), appUser.getCreatedAt());
     }
 
     public AppUserDto create(CreateAppUserDto createAppUser) {
@@ -36,29 +38,25 @@ public class AppUserService {
                 createAppUser.password() == null || createAppUser.password().isEmpty()) {
             throw ClientErrors.invalidCredentials();
         }
-        if(appUserRepository.existsByName(createAppUser.name())){
+        if (appUserRepository.existsByName(createAppUser.name())) {
             throw ClientErrors.userNameTaken(createAppUser.name());
         }
         AppUser appUser = toEntity(createAppUser);
         appUserRepository.save(appUser);
         return toDto(appUser);
-
-
-}
+    }
 
     private AppUser toEntity(CreateAppUserDto createAppUser) {
         String hashedPassword = WeakCrypto.hashPassword(createAppUser.password());
-        return new AppUser(createAppUser.name(),hashedPassword);
-
+        return new AppUser(createAppUser.name(), hashedPassword);
     }
-    public AppUserDto get(String userName){       // remember username is not the key
-        return appUserRepository.findByName(userName).map(this::toDto).orElseThrow(()-> ClientErrors.userNotFound(userName));
 
+    public AppUserDto get(String userName) {       // remember username is not the key
+        return appUserRepository.findByName(userName).map(this::toDto).orElseThrow(() -> ClientErrors.userNotFound(userName));
     }
+
     public void delete(String userName) {
-        AppUser appUser = appUserRepository.findByName(userName).orElseThrow(()-> ClientErrors.userNotFound(userName));
+        AppUser appUser = appUserRepository.findByName(userName).orElseThrow(() -> ClientErrors.userNotFound(userName));
         appUserRepository.delete(appUser);
     }
-
-
 }

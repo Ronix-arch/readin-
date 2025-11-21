@@ -8,7 +8,6 @@ import oth.ics.wtp.readinbackend.controllers.AppUserController;
 import oth.ics.wtp.readinbackend.controllers.LikeController;
 import oth.ics.wtp.readinbackend.controllers.PostController;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
-import oth.ics.wtp.readinbackend.dtos.CreatePostDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +31,7 @@ public class LikeControllerTest extends ReadinControllerTestBase {
         appUserId = appUserController.createAppUser(new CreateAppUserDto("user1", "password1")).id();
         likingUserId1 = appUserController.createAppUser(new CreateAppUserDto("user2", "password2")).id();
         likingUserId2 = appUserController.createAppUser(new CreateAppUserDto("user3", "password3")).id();
-        postId = postController.createPost(user0(), appUserId, new CreatePostDto("post1OfUser1")).id();
+        postId = postController.createPost(user0(), appUserId, "post1OfUser1", null).id();
 
     }
 
@@ -58,4 +57,3 @@ public class LikeControllerTest extends ReadinControllerTestBase {
 
 
 }
-

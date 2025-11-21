@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import oth.ics.wtp.readinbackend.entities.AppUser;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -11,4 +12,6 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByName(String name);
 
     boolean existsByName(String username);
+
+    List<AppUser> findByNameContainingIgnoreCase(String name);
 }

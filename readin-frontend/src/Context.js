@@ -1,3 +1,5 @@
 import {createContext} from "react";
 
-export const Api = createContext(import.meta.env.VITE_APP_READIN_API)
+// All API calls will now be relative to the frontend's origin,
+// and Nginx will proxy them to the backend.
+export const Api = createContext("/api");

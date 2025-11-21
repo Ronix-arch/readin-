@@ -30,7 +30,7 @@ public class AppUserControllerTest extends ReadinControllerTestBase {
         appUserController.createAppUser(new CreateAppUserDto("user1", "password1"));
         appUserController.createAppUser(new CreateAppUserDto("user2", "password2"));
 
-        List<AppUserDto> appUsers = appUserController.getAppUsers(user0());
+        List<AppUserDto> appUsers = appUserController.getAppUsers(user0(), null);
         assertTrue(appUsers.stream().anyMatch(u -> u.name().equals("user1")));
         assertTrue(appUsers.stream().anyMatch(u -> u.name().equals("user2")));
 
