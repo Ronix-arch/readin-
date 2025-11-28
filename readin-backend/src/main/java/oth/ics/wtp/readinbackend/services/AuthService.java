@@ -45,7 +45,7 @@ public class AuthService {
             String password = parts[1];
             String hashedPassword = WeakCrypto.hashPassword(password);
             AppUser appUser = appUserRepository.findByName(username).orElseThrow();
-            if (!appUser.getHashedPassword().equals(hashedPassword)) {
+            if (!appUser.getPassword().equals(hashedPassword)) {
                 throw new Exception();
             }
             request.getSession().setAttribute(SESSION_USER_NAME, username);

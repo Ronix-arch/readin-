@@ -2,12 +2,13 @@ package oth.ics.wtp.readinbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import oth.ics.wtp.readinbackend.ClientErrors;
 import oth.ics.wtp.readinbackend.WeakCrypto;
 import oth.ics.wtp.readinbackend.dtos.AppUserDto;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
+import oth.ics.wtp.readinbackend.dtos.UpdateAppUserDto;
 import oth.ics.wtp.readinbackend.entities.AppUser;
-import oth.ics.wtp.readinbackend.entities.Following;
 import oth.ics.wtp.readinbackend.repositories.AppUserRepository;
 
 import java.util.List;
@@ -15,10 +16,12 @@ import java.util.List;
 @Service
 public class AppUserService {
     private final AppUserRepository appUserRepository;
+    private final StorageService storageService;
 
     @Autowired
-    public AppUserService(AppUserRepository appUserRepository) {
+    public AppUserService(AppUserRepository appUserRepository, StorageService storageService) {
         this.appUserRepository = appUserRepository;
+        this.storageService = storageService;
     }
 
     public List<AppUserDto> appUsersList() {
@@ -30,7 +33,14 @@ public class AppUserService {
     }
 
     private AppUserDto toDto(AppUser appUser) {
-        return new AppUserDto(appUser.getId(), appUser.getName(), appUser.getCreatedAt());
+        return new AppUserDto(
+                appUser.getId(),
+                appUser.getName(),
+                appUser.getCreatedAt(),
+                appUser.getProfilePictureUrl(),
+                appUser.getEmail(),
+                appUser.getBio()
+        );
     }
 
     public AppUserDto create(CreateAppUserDto createAppUser) {
@@ -51,8 +61,31 @@ public class AppUserService {
         return new AppUser(createAppUser.name(), hashedPassword);
     }
 
-    public AppUserDto get(String userName) {       // remember username is not the key
+    public AppUserDto get(String userName) {
         return appUserRepository.findByName(userName).map(this::toDto).orElseThrow(() -> ClientErrors.userNotFound(userName));
+    }
+
+    public AppUserDto getById(Long userId) {
+        return appUserRepository.findById(userId).map(this::toDto).orElseThrow(() -> ClientErrors.userIdNotFound(userId));
+    }
+
+    public AppUserDto updateUser(Long userId, UpdateAppUserDto updateDto, MultipartFile profilePicture) {
+        AppUser user = appUserRepository.findById(userId)
+                .orElseThrow(() -> ClientErrors.userIdNotFound(userId));
+
+        if (updateDto.email() != null) {
+            user.setEmail(updateDto.email());
+        }
+        if (updateDto.bio() != null) {
+            user.setBio(updateDto.bio());
+        }
+
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            String filename = storageService.store(profilePicture);
+            user.setProfilePictureUrl(filename);
+        }
+
+        return toDto(appUserRepository.save(user));
     }
 
     public void delete(String userName) {

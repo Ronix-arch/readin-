@@ -3,10 +3,8 @@ package oth.ics.wtp.readinbackend.entities;
 import jakarta.persistence.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
-import static jakarta.persistence.FetchType.EAGER;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class AppUser {
@@ -15,74 +13,69 @@ public class AppUser {
     private Long id;
     @Column(unique = true)
     private String name;
-    private String hashedPassword;
+    private String password;
     private Instant createdAt;
-    @OneToMany(mappedBy = "followee")
-    private List<Following> followers; // Users who follow this user
 
-    @OneToMany(mappedBy = "follower")
-    private List<Following> followings; // Users this user follows
-    @OneToMany(fetch = EAGER)
-    private List<Post> appUserPosts;
+    private String profilePictureUrl;
+    @Column(unique = true)
+    private String email;
+    @Lob // Specifies that the database should store the string as a large object.
+    private String bio;
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Following> following = new HashSet<>();
+
+    @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Following> followers = new HashSet<>();
+
 
     public AppUser() {
     }
 
-    public AppUser(String name, String hashedPassword) {
+    public AppUser(String name, String password) {
         this.name = name;
-        this.hashedPassword = hashedPassword;
+        this.password = password;
         this.createdAt = Instant.now();
-        this.followers = new ArrayList<>();
-        this.followings = new ArrayList<>();
-        appUserPosts = new ArrayList<>();
     }
 
-    public List<Following> getFollowers() {
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public Set<Following> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<Following> following) {
+        this.following = following;
+    }
+
+    public Set<Following> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(List<Following> followers) {
+    public void setFollowers(Set<Following> followers) {
         this.followers = followers;
-    }
-
-    public List<Following> getFollowings() {
-        return followings;
-    }
-
-    public void setFollowing(List<Following> followings) {
-        this.followings = followings;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Post> getAppUserPosts() {
-        return appUserPosts;
-    }
-
-    public void setAppUserPosts(List<Post> appUserPosts) {
-        this.appUserPosts = appUserPosts;
-    }
-
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -93,4 +86,27 @@ public class AppUser {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 }

@@ -3,31 +3,32 @@ import {Api} from "./Context.js";
 import {basic, basicJson} from "./Headers.js";
 import CreatePostcreation from "./Userpostcreation.jsx";
 import {hasUserLikedPost, likePost, numberOfLikePost, unlikePost} from "./TimelinePosts.jsx";
+import CommentSection from "./CommentSection.jsx";
 
 
 export default function UserProfilePosts({auth, userId}) {
     const api = useContext(Api);
     const [posts, setPosts] = useState([]);
-    const [editPostContent, setEditPostContent] = useState("");
-    const [likeCounts, setLikeCounts] = useState({});  // IT TRACKS THE LIKES
+    const [editPostContents, setEditPostContents] = useState({}); // Changed to an object
+    const [likeCounts, setLikeCounts] = useState({});
     const [likeStatus, setLikeStatus] = useState({});
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [numberOfPosts, setNumberOfPosts] = useState(0); // to track the number of posts
+    const [numberOfPosts, setNumberOfPosts] = useState(0);
+    const [showComments, setShowComments] = useState({});
 
     useEffect(() => {
         if (!userId) return;
         fetchUsersOwnPosts(api, auth, userId, page)
             .then((data) => {
-                setPosts((prev) => [...prev, ...data.content]); // `content` is from Spring Page
-                setHasMore(!data.last); // indicates if more pages are available
-                setNumberOfPosts(data.totalElements); // Set the total number of posts
+                setPosts((prev) => [...prev, ...data.content]);
+                setHasMore(!data.last);
+                setNumberOfPosts(data.totalElements);
             })
             .catch((error) => console.error("Error in fetching posts: ", error));
     }, [api, auth, userId, page]);
 
 
-// to make sure the number of likes is fetched after the posts load.
     useEffect(() => {
         if (posts.length > 0) {
             posts.forEach(post => hasUserLikedPost(api, auth, setLikeStatus, userId, post.id));
@@ -35,9 +36,16 @@ export default function UserProfilePosts({auth, userId}) {
         }
     }, [posts]);
 
+    const toggleComments = (postId) => {
+        setShowComments(prev => ({...prev, [postId]: !prev[postId]}));
+    };
+
+    function handleEditChange(postId, value) {
+        setEditPostContents(prev => ({ ...prev, [postId]: value }));
+    }
 
     function updateuserposts(appUserId, postId) {
-        const updatedPost = {content: editPostContent};
+        const updatedPost = {content: editPostContents[postId] || ""};
         fetch(api + "/appUsers/" + appUserId + "/posts/" + postId, {
             headers: basicJson(auth),
             method: "PUT",
@@ -49,7 +57,7 @@ export default function UserProfilePosts({auth, userId}) {
             })
             .then(result => {
                 setPosts(posts.map(p => (p.id === postId ? result : p)));
-                setEditPostContent(""); // clear the input after  new
+                handleEditChange(postId, ""); // Clear the specific input
             })
             .catch(error => console.error("Error in UPDATING  post: ", error));
     }
@@ -65,7 +73,7 @@ export default function UserProfilePosts({auth, userId}) {
     }
 
 
-    if (userId === auth.id) {
+    if (String(userId) === String(auth.id)) {
         return (<>
                 <h2> Your have created sofar {numberOfPosts} Posts </h2>
 
@@ -88,12 +96,16 @@ export default function UserProfilePosts({auth, userId}) {
                             <div className="grid">
                                 <input type="text"
                                        placeholder="Edit this Post Content "
-                                       value={editPostContent}
-                                       onChange={(e) => setEditPostContent(e.target.value)}
+                                       value={editPostContents[p.id] || ""}
+                                       onChange={(e) => handleEditChange(p.id, e.target.value)}
                                 />
                                 <button onClick={() => updateuserposts(userId, p.id)}>Update Post</button>
                                 <button onClick={() => deletePost(userId, p.id)}>Delete Post</button>
                             </div>
+                            <button onClick={() => toggleComments(p.id)}>
+                                {showComments[p.id] ? "Hide Comments" : `Comments (${p.commentCount})`}
+                            </button>
+                            {showComments[p.id] && <CommentSection postId={p.id} auth={auth} />}
                         </footer>
                     </article>
                 ))}
@@ -133,7 +145,11 @@ export default function UserProfilePosts({auth, userId}) {
                                     )}
                                     <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
                                 </div>
+                                <button onClick={() => toggleComments(p.id)}>
+                                    {showComments[p.id] ? "Hide Comments" : `Comments (${p.commentCount})`}
+                                </button>
                             </div>
+                            {showComments[p.id] && <CommentSection postId={p.id} auth={auth} />}
                         </footer>
                     </article>
                 ))}

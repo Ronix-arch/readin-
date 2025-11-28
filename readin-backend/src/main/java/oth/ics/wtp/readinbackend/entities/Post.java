@@ -1,6 +1,7 @@
 package oth.ics.wtp.readinbackend.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.OnDelete;
 
 import java.time.Instant;
@@ -18,15 +19,17 @@ public class Post {
     private String attachmentUrl;
     private String attachmentType;
     private Instant createdAt;
-    @ManyToOne
-    @JoinColumn(name = "app_user_id")  // Ensure the correct column is mapp
 
+    @Formula("(select count(*) from comment c where c.post_id = id)")
+    private int commentCount;
+
+    @ManyToOne
+    @JoinColumn(name = "app_user_id")
     @OnDelete(action = CASCADE)
     private AppUser appUser;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
-
 
     public Post() {
     }
@@ -36,6 +39,10 @@ public class Post {
         this.appUser = appUser;
         this.createdAt = Instant.now();
         this.likes = new ArrayList<>();
+    }
+
+    public int getCommentCount() {
+        return commentCount;
     }
 
     public List<Like> getLikes() {

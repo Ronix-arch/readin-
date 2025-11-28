@@ -11,6 +11,8 @@ import oth.ics.wtp.readinbackend.controllers.PostController;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
 import oth.ics.wtp.readinbackend.dtos.PostDto;
 import oth.ics.wtp.readinbackend.dtos.UpdatePostDto;
+import oth.ics.wtp.readinbackend.services.AppUserService;
+import oth.ics.wtp.readinbackend.services.PostService;
 
 import java.util.List;
 
@@ -23,6 +25,10 @@ public class PostControllerTest extends ReadinControllerTestBase {
     private AppUserController appUserController;
     @Autowired
     private FollowingController followingController;
+    @Autowired
+    private AppUserService appUserService;
+    @Autowired
+    private PostService postService;
 
 
     private long appUserId;
@@ -81,9 +87,6 @@ public class PostControllerTest extends ReadinControllerTestBase {
 
         List<PostDto> timelinePosts = postController.getTimeLinePosts(user0(), appUserId, 0, 20).toList();
         assertFalse(timelinePosts.isEmpty());
-        //assertEquals(2, timelinePosts.size());
-        //assertTrue(timelinePosts.stream().anyMatch(p->p.content().equals("post1OfFollowee1")));
-        //assertTrue(timelinePosts.stream().anyMatch(p->p.content().equals("post1OfFollowee2")));
         assertEquals(2, timelinePosts.size());
         assertTrue(timelinePosts.stream().anyMatch(p -> p.content().equals("post1OfFollowee1")));
         assertTrue(timelinePosts.stream().anyMatch(p -> p.content().equals("post1OfFollowee2")));

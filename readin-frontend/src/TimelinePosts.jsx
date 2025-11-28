@@ -1,26 +1,24 @@
 import {useContext, useEffect, useState} from "react";
 import {Api} from "./Context.js";
 import {basic} from "./Headers.js";
+import CommentSection from "./CommentSection.jsx";
 
 export default function TimelinePosts({auth, userId}) {
     const api = useContext(Api);
 
     const [posts, setPosts] = useState([]);
-    //const [page, setPage] = useState(1);
     const [likeCounts, setLikeCounts] = useState({});
-
-
     const [likeStatus, setLikeStatus] = useState({});
-
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [showComments, setShowComments] = useState({});
 
     useEffect(() => {
         if (!userId) return;
         fetchTimelinePosts(api, auth, userId, page)
             .then((data) => {
-                setPosts((prev) => [...prev, ...data.content]); // `content` is from Spring Page
-                setHasMore(!data.last); // indicates if more pages are available
+                setPosts((prev) => [...prev, ...data.content]);
+                setHasMore(!data.last);
             })
             .catch((error) => console.error("Error in fetching posts: ", error));
     }, [api, auth, userId, page]);
@@ -30,11 +28,15 @@ export default function TimelinePosts({auth, userId}) {
         if (posts.length > 0) {
             posts.forEach(post => hasUserLikedPost(api, auth, setLikeStatus, userId, post.id));
             posts.forEach(post => numberOfLikePost(api, auth, setLikeCounts, post.id));
-        }//  to Ensure like count is fetched after posts load
+        }
     }, [posts]);
 
+    const toggleComments = (postId) => {
+        setShowComments(prev => ({...prev, [postId]: !prev[postId]}));
+    };
 
     return (<>
+            <h1>Timeline</h1>
             <h2> Your Followees' Posts 💬</h2>
             {posts.map(p => (
                 <article key={p.id}>
@@ -61,7 +63,11 @@ export default function TimelinePosts({auth, userId}) {
 
                             )}
                             <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
+                            <button onClick={() => toggleComments(p.id)}>
+                                {showComments[p.id] ? "Hide Comments" : `Comments (${p.commentCount})`}
+                            </button>
                         </div>
+                        {showComments[p.id] && <CommentSection postId={p.id} auth={auth} />}
                     </footer>
                 </article>
             ))}

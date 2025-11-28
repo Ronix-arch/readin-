@@ -12,45 +12,49 @@ import oth.ics.wtp.readinbackend.repositories.FollowingRepository;
 
 import java.util.List;
 
-@Service public class FollowingService {
- private FollowingRepository followingRepository;
- private AppUserRepository appUserRepository;
+@Service
+public class FollowingService {
+    private final FollowingRepository followingRepository;
+    private final AppUserRepository appUserRepository;
 
- @Autowired public FollowingService(FollowingRepository followingRepository, AppUserRepository appUserRepository) {
-     this.followingRepository = followingRepository;
-     this.appUserRepository = appUserRepository;
- }
-    public void followUser(long followerId, long  followeeId) {
+    @Autowired
+    public FollowingService(FollowingRepository followingRepository, AppUserRepository appUserRepository) {
+        this.followingRepository = followingRepository;
+        this.appUserRepository = appUserRepository;
+    }
+
+    public void followUser(long followerId, long followeeId) {
         if (followingRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw ClientErrors.followingAlreadyExsists(followerId,followeeId);
+            throw ClientErrors.followingAlreadyExsists(followerId, followeeId);
         }
-            AppUser follower = appUserRepository.findById(followerId).orElseThrow(()-> ClientErrors.userIdNotFound(followerId));
-            AppUser followee = appUserRepository.findById(followeeId).orElseThrow(()-> ClientErrors.userIdNotFound(followeeId));
-            Following following = toEntity(follower,followee);
-            followingRepository.save(following);
+        AppUser follower = appUserRepository.findById(followerId).orElseThrow(() -> ClientErrors.userIdNotFound(followerId));
+        AppUser followee = appUserRepository.findById(followeeId).orElseThrow(() -> ClientErrors.userIdNotFound(followeeId));
+        Following following = toEntity(follower, followee);
+        followingRepository.save(following);
 
     }
+
     @Transactional
-    public void unfollowUser(long followerId, long  followeeId) {
+    public void unfollowUser(long followerId, long followeeId) {
         if (!followingRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
-            throw ClientErrors.followingDoesNotExsists(followerId,followeeId);
+            throw ClientErrors.followingDoesNotExsists(followerId, followeeId);
         }
 
         followingRepository.deleteByFollowerIdAndFolloweeId(followerId, followeeId);
     }
-    public boolean isFollowing(long followerId, long  followeeId) {
+
+    public boolean isFollowing(long followerId, long followeeId) {
         return followingRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId);
     }
+
     public List<AppUserDto> getFollowers(long userId) {
         List<Following> followers = followingRepository.findByFolloweeId(userId);
         return followers.stream()
                 .map(f -> appUserRepository.findById(f.getFollower().getId())
                         .map(this::convertToDto)
-                        .orElseThrow(()-> ClientErrors.userIdNotFound(f.getFollower().getId())))
+                        .orElseThrow(() -> ClientErrors.userIdNotFound(f.getFollower().getId())))
                 .toList();
 
-                //.filter(Objects::nonNull)
-                //.collect(Collectors.toList());
     }
 
     public List<AppUserDto> getFollowings(long userId) {
@@ -58,17 +62,18 @@ import java.util.List;
         return followings.stream()
                 .map(f -> appUserRepository.findById(f.getFollowee().getId())
                         .map(this::convertToDto)
-                        .orElseThrow(()-> ClientErrors.userIdNotFound(f.getFollower().getId())))
+                        .orElseThrow(() -> ClientErrors.userIdNotFound(f.getFollower().getId())))
                 .toList();
 
 
+    }
 
-    }
     private AppUserDto convertToDto(AppUser appUser) {
-        return new AppUserDto(appUser.getId(),appUser.getName(),appUser.getCreatedAt());
+        return new AppUserDto(appUser.getId(), appUser.getName(), appUser.getCreatedAt(), appUser.getProfilePictureUrl(), appUser.getEmail(), appUser.getBio());
     }
+
     private Following toEntity(AppUser follower, AppUser followee) {
-     return new Following(follower,followee);
+        return new Following(follower, followee);
     }
 
 }

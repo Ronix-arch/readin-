@@ -1,4 +1,4 @@
-function makeBasic(auth) {
+export function makeBasic(auth) {
     return "Basic " + btoa(auth.name + ":" + auth.password);
 }
 

@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import oth.ics.wtp.readinbackend.dtos.AppUserDto;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
+import oth.ics.wtp.readinbackend.dtos.UpdateAppUserDto;
 import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.services.AppUserService;
 import oth.ics.wtp.readinbackend.services.AuthService;
@@ -44,11 +46,24 @@ public class AppUserController {
     }
 
     @SecurityRequirement(name = "basicAuth")
-    @GetMapping(value = "appUsers/{appUserName}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public AppUserDto getAppUser(HttpServletRequest request, @PathVariable("appUserName") String appUserName) {
+    @GetMapping(value = "appUsers/{appUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AppUserDto getAppUser(HttpServletRequest request, @PathVariable("appUserId") Long appUserId) {
         authService.getAuthenticatedUser(request);
-        return appUserService.get(appUserName);
+        return appUserService.getById(appUserId);
+    }
 
+    @SecurityRequirement(name = "basicAuth")
+    @PutMapping(value = "appUsers/{appUserId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public AppUserDto updateUser(
+            HttpServletRequest request,
+            @PathVariable("appUserId") Long appUserId,
+            @RequestPart("updateDto") UpdateAppUserDto updateDto,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        AppUser authenticatedUser = authService.getAuthenticatedUser(request);
+        if (!authenticatedUser.getId().equals(appUserId)) {
+            throw new SecurityException("You can only update your own profile.");
+        }
+        return appUserService.updateUser(appUserId, updateDto, file);
     }
 
     @SecurityRequirement(name = "basicAuth")
@@ -66,6 +81,8 @@ public class AppUserController {
         AppUser appUser = authService.logIn(request);
         return appUserService.get(appUser.getName());
     }
+
+
 
     @SecurityRequirement(name = "basicAuth")
     @ResponseStatus(HttpStatus.NO_CONTENT)

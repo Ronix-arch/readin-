@@ -8,6 +8,9 @@ import oth.ics.wtp.readinbackend.controllers.AppUserController;
 import oth.ics.wtp.readinbackend.controllers.LikeController;
 import oth.ics.wtp.readinbackend.controllers.PostController;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
+import oth.ics.wtp.readinbackend.services.AppUserService;
+import oth.ics.wtp.readinbackend.services.LikeService;
+import oth.ics.wtp.readinbackend.services.PostService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,6 +21,12 @@ public class LikeControllerTest extends ReadinControllerTestBase {
     private LikeController likeController;
     @Autowired
     private AppUserController appUserController;
+    @Autowired
+    private AppUserService appUserService;
+    @Autowired
+    private PostService postService;
+    @Autowired
+    private LikeService likeService;
 
     private long appUserId;
     private long likingUserId1;

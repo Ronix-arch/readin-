@@ -1,91 +1,59 @@
-import{useContext, useRef,useState} from 'react';
-import {Api} from "./Context.js";
-import {basic, anonJson} from "./Headers.js";
+import { useContext, useState } from "react";
+import { Api } from "./Context.js";
+import { basicJson, makeBasic } from "./Headers.js";
 
-export default function Login({auth, setAuth}) {
+export default function Login({ setAuth }) {
     const api = useContext(Api);
-    const [createAccount, setCreateAccount] = useState(false);
-    const name = useRef(undefined);
-    const password = useRef(undefined);
+    const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
+    const [isNewUser, setIsNewUser] = useState(false);
 
-    function logOut(){
-        fetch(api + "/appUsers/logout",{method: "POST",headers:basic(auth)}).then(response => {
-            if (!response.ok) throw new Error(response.statusText);
-        }).then(()=>{
-            setAuth({id: null,name: null, password: null, loggedIn: false});
-            // is set use r possible?
-
-        }).catch(error => console.error("Error logging out:", error));
-
-
-    }
-
-
-
-    function logIn(){
-        const newAuth = {name: name.current.value, password: password.current.value};
-
-        fetch(api+"/appUsers/login",{
+    function logIn() {
+        const authData = { name, password };
+        fetch(api + "/appUsers/login", {
             method: "POST",
-            headers: basic(newAuth)
+            headers: { "Authorization": makeBasic(authData) }
         })
-            .then(response => {
-                if (!response.ok) {
-                    window.alert( "Login failed: Either the User name or the password is not correct " + response.statusText);
-                    throw new Error(response.statusText);
-                    }
-                return response.json();
-
-            })
-            .then(result => {
-                    newAuth.id = result.id;
-                    newAuth.loggedIn = true;
-                    setAuth(newAuth);
-                    console.log("Login successful:", newAuth);
-
-
-            }).catch(error => console.error("Error in logging in : ", error));
-    }
-
-
-    function register(){
-        const newAuth = {name: name.current.value, password: password.current.value};
-        fetch(api + "/appUsers" ,{method: "POST",headers: anonJson(), body: JSON.stringify(newAuth)}).then(response => {
+        .then(response => {
             if (response.ok) return response.json();
-            else throw new Error(response.statusText);
-        }).then(result => {
-            newAuth.id = result.id; // also here
-            newAuth.loggedIn = true;
-            setAuth(newAuth);
-        }).catch(error => console.error("Error in creating  an Account: ", error));
-    }
-    if (auth.loggedIn){
-        return <>
-            <p> Curently logged in as: {auth.name}</p>
-            <button onClick={logOut}>Log Out</button>
-        </>;
-}else {
-    return<>
-        <p> Curently not logged in.</p>
-        <div>
-            <input id = "new-account" type="checkbox" checked={createAccount}
-                   onChange={e =>setCreateAccount(e.target.checked)} />
-            <label htmlFor="new-account">I want to create a new account </label>
-        </div>
-        <div className ="grid">
-            <div>
-                <label htmlFor= "name">User name:</label>
-                <input id ="name" ref={name}/>
-            </div>
-        <div>
-        <label htmlFor="password">Password:</label>
-        <input type="password" id="password" ref={password}/>
-        </div>
-        </div>
-        {createAccount ?
-            <button onClick={register}>Register</button>
-        : <button onClick={logIn}>Log in</button> }
-    </>;
+            throw new Error("Error in logging in");
+        })
+        .then(user => {
+            // This is the fix: include loggedIn: true
+            setAuth({ ...user, password, loggedIn: true });
+        })
+        .catch(error => console.error("Error in logging in: ", error));
     }
 
+    function createUser() {
+        const newUserData = { name, password };
+        fetch(api + "/appUsers", {
+            method: "POST",
+            headers: basicJson({ name: "unused", password: "unused" }), // Creating a user is a public action
+            body: JSON.stringify(newUserData)
+        })
+        .then(response => {
+            if (response.ok) return response.json();
+            throw new Error("Error in creating user");
+        })
+        .then(user => {
+            // This is the fix: include loggedIn: true
+            setAuth({ ...user, password, loggedIn: true });
+        })
+        .catch(error => console.error("Error in creating user: ", error));
+    }
+
+    return (
+        <div>
+            <h2>{isNewUser ? "Create New User" : "Log In"}</h2>
+            <input type="text" placeholder="Username" value={name} onChange={e => setName(e.target.value)} />
+            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+            <button onClick={isNewUser ? createUser : logIn}>
+                {isNewUser ? "Create User" : "Log In"}
+            </button>
+            <button onClick={() => setIsNewUser(!isNewUser)}>
+                {isNewUser ? "Already have an account? Log In" : "Don't have an account? Sign Up"}
+            </button>
+        </div>
+    );
 }
