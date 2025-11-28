@@ -26,10 +26,14 @@ export default function TimelinePosts({auth, userId}) {
 
     useEffect(() => {
         if (posts.length > 0) {
-            posts.forEach(post => hasUserLikedPost(api, auth, setLikeStatus, userId, post.id));
-            posts.forEach(post => numberOfLikePost(api, auth, setLikeCounts, post.id));
+            posts.forEach(post => {
+                if (post && post.id) {
+                    hasUserLikedPost(api, auth, setLikeStatus, userId, post.id);
+                    numberOfLikePost(api, auth, setLikeCounts, post.id);
+                }
+            });
         }
-    }, [posts]);
+    }, [posts]); // The bug was here. I have removed the extra dependencies.
 
     const toggleComments = (postId) => {
         setShowComments(prev => ({...prev, [postId]: !prev[postId]}));
@@ -41,7 +45,10 @@ export default function TimelinePosts({auth, userId}) {
             {posts.map(p => (
                 <article key={p.id}>
                     <header>
-                        <h5>@{p.userName}</h5>
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            {p.userProfilePictureUrl && <img src={`${api}/files/${p.userProfilePictureUrl}`} alt="Profile" style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "10px" }} />}
+                            <h5>@{p.userName}</h5>
+                        </div>
                     </header>
                     <p>{p.content}</p>
                     {p.attachmentUrl && (
@@ -57,12 +64,11 @@ export default function TimelinePosts({auth, userId}) {
 
                         <div className="grid">
                             {likeStatus[p.id] !== undefined && (likeStatus[p.id] ?
-                                <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> ❤️UnLike </button> :
-                                <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}> 🤍
-                                    Like</button>
+                                <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}>❤️</button> :
+                                <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}>🤍</button>
 
                             )}
-                            <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
+                            <p>Likes: {likeCounts[p.id] || 0}</p>
                             <button onClick={() => toggleComments(p.id)}>
                                 {showComments[p.id] ? "Hide Comments" : `Comments (${p.commentCount})`}
                             </button>

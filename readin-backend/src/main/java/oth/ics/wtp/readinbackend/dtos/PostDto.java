@@ -10,6 +10,7 @@ public record PostDto(
     Instant createdAt,
     long userId,
     String userName,
+    String userProfilePictureUrl,
     int commentCount
 ) {
 }

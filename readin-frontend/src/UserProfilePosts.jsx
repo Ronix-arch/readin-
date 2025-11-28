@@ -81,6 +81,12 @@ export default function UserProfilePosts({auth, userId}) {
                 <h2> User profile(own) Posts 💬 </h2>
                 {posts.map((p) => (
                     <article key={p.id}>
+                        <header>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                {p.userProfilePictureUrl && <img src={`${api}/files/${p.userProfilePictureUrl}`} alt="Profile" style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "10px" }} />}
+                                <h5>@{p.userName}</h5>
+                            </div>
+                        </header>
                         <p>{p.content}</p>
                         {p.attachmentUrl && (
                             p.attachmentType.startsWith("image/") ? (
@@ -92,7 +98,7 @@ export default function UserProfilePosts({auth, userId}) {
                         <footer>
                             <p>Posted
                                 on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
-                            <p>Number of Likes 👍: {likeCounts[p.id] || 0}</p>
+                            <p>Likes: {likeCounts[p.id] || 0}</p>
                             <div className="grid">
                                 <input type="text"
                                        placeholder="Edit this Post Content "
@@ -123,6 +129,12 @@ export default function UserProfilePosts({auth, userId}) {
                 <h2> User profile(own) Posts </h2>
                 {posts.map((p) => (
                     <article key={p.id}>
+                        <header>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                {p.userProfilePictureUrl && <img src={`${api}/files/${p.userProfilePictureUrl}`} alt="Profile" style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "10px" }} />}
+                                <h5>@{p.userName}</h5>
+                            </div>
+                        </header>
                         <p>{p.content}</p>
                         {p.attachmentUrl && (
                             p.attachmentType.startsWith("image/") ? (
@@ -139,11 +151,11 @@ export default function UserProfilePosts({auth, userId}) {
 
                                 <div className="grid">
                                     {likeStatus[p.id] !== undefined && (likeStatus[p.id] ?
-                                        <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}> ❤️ UnLike </button> :
-                                        <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}>🤍 Like</button>
+                                        <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}>❤️</button> :
+                                        <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, auth.id, p.id)}>🤍</button>
 
                                     )}
-                                    <p>Number of likes 👍: {likeCounts[p.id] || 0}</p>
+                                    <p>Likes: {likeCounts[p.id] || 0}</p>
                                 </div>
                                 <button onClick={() => toggleComments(p.id)}>
                                     {showComments[p.id] ? "Hide Comments" : `Comments (${p.commentCount})`}

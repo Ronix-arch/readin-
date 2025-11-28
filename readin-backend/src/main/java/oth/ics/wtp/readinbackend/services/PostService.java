@@ -84,6 +84,7 @@ public class PostService {
                 post.getCreatedAt(),
                 post.getAppUser().getId(),
                 post.getAppUser().getName(),
+                post.getAppUser().getProfilePictureUrl(),
                 post.getCommentCount()
         );
     }

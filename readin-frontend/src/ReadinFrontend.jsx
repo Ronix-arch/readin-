@@ -31,7 +31,12 @@ export default function ReadinFrontend() {
             <header className="container">
                 <nav>
                     <ul>
-                        <li><strong>ReadIn 🎭</strong></li>
+                        <li>
+                            <a href="#" onClick={() => setView("timeline")} style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+                                <img src="/appIcon.png" alt="ReadIn Icon" style={{ width: "40px", height: "40px", marginRight: "10px" }} />
+                                <strong style={{ fontSize: "1.5rem", fontStyle: "italic" }}>ReadIn</strong>
+                            </a>
+                        </li>
                     </ul>
                     {auth.loggedIn && (
                         <ul>
@@ -51,7 +56,7 @@ export default function ReadinFrontend() {
             </main>
             <footer className="container">
                 <p> Express Yourself. The Space is yours @ Readin </p>
-                <p><small> Summer 2025, Web Technology Project, International Computer Science, OTH Regensburg</small></p>
+                <p><small>ReadIn is here. Let the world know a little bit about you.</small></p>
             </footer>
         </>
     );

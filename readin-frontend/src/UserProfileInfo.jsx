@@ -51,6 +51,8 @@ export default function UserProfileInfo({ auth, userId, onNavigateToProfile }) {
     const [following, setFollowing] = useState([]);
     const [isFollowing, setIsFollowing] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [showFollowers, setShowFollowers] = useState(false);
+    const [showFollowing, setShowFollowing] = useState(false);
 
     useEffect(() => {
         fetch(`${api}/appUsers/${userId}`, { headers: basic(auth) })
@@ -106,16 +108,24 @@ export default function UserProfileInfo({ auth, userId, onNavigateToProfile }) {
             {isEditing && <EditProfileForm user={user} auth={auth} onProfileUpdate={handleProfileUpdate} />}
 
             <div>
-                <h4>Followers ({followers.length})</h4>
-                <ul>
-                    {followers.map(f => <li key={f.id} onClick={() => onNavigateToProfile(f.id)}><a href="#">{f.name}</a></li>)}
-                </ul>
+                <button onClick={() => setShowFollowers(!showFollowers)}>
+                    {showFollowers ? "Hide Followers" : `Followers (${followers.length})`}
+                </button>
+                {showFollowers && (
+                    <ul>
+                        {followers.map(f => <li key={f.id} onClick={() => onNavigateToProfile(f.id)}><a href="#">{f.name}</a></li>)}
+                    </ul>
+                )}
             </div>
             <div>
-                <h4>Following ({following.length})</h4>
-                <ul>
-                    {following.map(f => <li key={f.id} onClick={() => onNavigateToProfile(f.id)}><a href="#">{f.name}</a></li>)}
-                </ul>
+                <button onClick={() => setShowFollowing(!showFollowing)}>
+                    {showFollowing ? "Hide Following" : `Following (${following.length})`}
+                </button>
+                {showFollowing && (
+                    <ul>
+                        {following.map(f => <li key={f.id} onClick={() => onNavigateToProfile(f.id)}><a href="#">{f.name}</a></li>)}
+                    </ul>
+                )}
             </div>
         </div>
     );
