@@ -9,7 +9,11 @@ in this app, one can
 * create, edit and delete his own posts
 * follow other users and see there posts 
 * Un-liking posts currently liked by the user
+* <img width="1642" height="1384" alt="hggh" src="https://github.com/user-attachments/assets/97b9dc7f-38a5-4438-8552-8912b6a61498" />
+
 * Deleting one’s own posts (in profile tab)
-* Managing one’s own user profile (it displays the name ,number of posts created sofar, number of followers, number of followees, Also in the User Profile , one can create, update, and delete their posts)
+* Managing one’s own user profile (it displays the name , profile image,number of posts created sofar, number of followers, number of followees, Also in the User Profile , one can create, update, and delete their posts)
+* <img width="1526" height="1466" alt="hggh1" src="https://github.com/user-attachments/assets/8e357f9f-1530-4604-aa56-fc4f7be48880" />
+
 * Displaying the user profile of a different user(in the User Profile, one can navigate throught their followers and  Followees and see their individual profiles and posts)
 * Presenting the timeline posts  and users own post of posts as a paginated view ( 20 posts per page both in the timeline and user profile)
