@@ -8,9 +8,6 @@ import oth.ics.wtp.readinbackend.controllers.AppUserController;
 import oth.ics.wtp.readinbackend.controllers.LikeController;
 import oth.ics.wtp.readinbackend.controllers.PostController;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
-import oth.ics.wtp.readinbackend.services.AppUserService;
-import oth.ics.wtp.readinbackend.services.LikeService;
-import oth.ics.wtp.readinbackend.services.PostService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,12 +18,6 @@ public class LikeControllerTest extends ReadinControllerTestBase {
     private LikeController likeController;
     @Autowired
     private AppUserController appUserController;
-    @Autowired
-    private AppUserService appUserService;
-    @Autowired
-    private PostService postService;
-    @Autowired
-    private LikeService likeService;
 
     private long appUserId;
     private long likingUserId1;
@@ -46,21 +37,21 @@ public class LikeControllerTest extends ReadinControllerTestBase {
 
     @Test
     public void testlikeAndgetlikes() {
-        likeController.likePost(user0(), likingUserId1, postId);
-        likeController.likePost(user0(), likingUserId2, postId);
+        likeController.likePost(mockRequest("user2", "password2"), likingUserId1, postId);
+        likeController.likePost(mockRequest("user3", "password3"), likingUserId2, postId);
         long NoOfLikes = likeController.getLikeCount(user0(), postId);
         assertEquals(2, NoOfLikes);
-        assertThrows(ResponseStatusException.class, () -> likeController.likePost(user0(), likingUserId1, postId));
+        assertThrows(ResponseStatusException.class, () -> likeController.likePost(mockRequest("user2", "password2"), likingUserId1, postId));
 
     }
 
     @Test
     public void testunlikePostCheck() {
-        likeController.likePost(user0(), likingUserId1, postId);
-        likeController.likePost(user0(), likingUserId2, postId);
-        assertTrue(likeController.hasUserLikedPost(user0(), likingUserId1, postId));
-        likeController.unlikePost(user0(), likingUserId2, postId);
-        assertFalse(likeController.hasUserLikedPost(user0(), likingUserId2, postId));
+        likeController.likePost(mockRequest("user2", "password2"), likingUserId1, postId);
+        likeController.likePost(mockRequest("user3", "password3"), likingUserId2, postId);
+        assertTrue(likeController.hasUserLikedPost(mockRequest("user2", "password2"), likingUserId1, postId));
+        likeController.unlikePost(mockRequest("user3", "password3"), likingUserId2, postId);
+        assertFalse(likeController.hasUserLikedPost(mockRequest("user3", "password3"), likingUserId2, postId));
 
     }
 

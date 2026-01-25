@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import oth.ics.wtp.readinbackend.entities.AppUser;
@@ -26,6 +27,8 @@ public abstract class ReadinControllerTestBase {
     private final Map<String, HttpSession> sessions = new HashMap<>();
     @Autowired
     protected AppUserRepository appUserRepository;
+    @Autowired
+    protected PasswordEncoder passwordEncoder;
 
     @BeforeEach
     public void beforeEach() {
@@ -35,7 +38,7 @@ public abstract class ReadinControllerTestBase {
 
     private void createAppUser(String appUsername, String password) {
         // create app user and store in repository
-        String passwordHash = WeakCrypto.hashPassword(password);
+        String passwordHash = passwordEncoder.encode(password);
         AppUser appUser = new AppUser(appUsername, passwordHash);
         appUserRepository.save(appUser);
 
@@ -50,6 +53,12 @@ public abstract class ReadinControllerTestBase {
         } else {
             request.setSession(sessions.get(userName));
         }
+
+        // Populate SecurityContext for direct controller calls
+        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        userName, password, java.util.Collections.emptyList()));
+
         return request;
     }
 
@@ -58,10 +67,7 @@ public abstract class ReadinControllerTestBase {
     }
 
     protected String basic(String appUserName, String password) {
-        return "Basic " + Base64.getEncoder().encodeToString((appUserName + ":" + password).getBytes(StandardCharsets.UTF_8));
+        return "Basic "
+                + Base64.getEncoder().encodeToString((appUserName + ":" + password).getBytes(StandardCharsets.UTF_8));
     }
-
-
 }
-
-

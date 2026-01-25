@@ -16,6 +16,9 @@ public class AppUser {
     private String password;
     private Instant createdAt;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
     private String profilePictureUrl;
     @Column(unique = true)
     private String email;
@@ -36,6 +39,15 @@ public class AppUser {
         this.name = name;
         this.password = password;
         this.createdAt = Instant.now();
+        this.role = UserRole.USER; // Default role
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     public String getProfilePictureUrl() {

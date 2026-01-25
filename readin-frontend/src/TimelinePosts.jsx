@@ -33,7 +33,7 @@ export default function TimelinePosts({auth, userId}) {
                 }
             });
         }
-    }, [posts]); // The bug was here. I have removed the extra dependencies.
+    }, [posts]);
 
     const toggleComments = (postId) => {
         setShowComments(prev => ({...prev, [postId]: !prev[postId]}));

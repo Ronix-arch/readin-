@@ -1,6 +1,7 @@
 package oth.ics.wtp.readinbackend.dtos;
 
 import java.time.Instant;
+import oth.ics.wtp.readinbackend.entities.UserRole;
 
 public record AppUserDto(
         Long id,
@@ -8,6 +9,7 @@ public record AppUserDto(
         Instant createdAt,
         String profilePictureUrl,
         String email,
-        String bio
+        String bio,
+        UserRole role
 ) {
 }

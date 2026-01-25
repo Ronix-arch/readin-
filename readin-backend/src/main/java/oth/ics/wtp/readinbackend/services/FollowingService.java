@@ -69,7 +69,7 @@ public class FollowingService {
     }
 
     private AppUserDto convertToDto(AppUser appUser) {
-        return new AppUserDto(appUser.getId(), appUser.getName(), appUser.getCreatedAt(), appUser.getProfilePictureUrl(), appUser.getEmail(), appUser.getBio());
+        return new AppUserDto(appUser.getId(), appUser.getName(), appUser.getCreatedAt(), appUser.getProfilePictureUrl(), appUser.getEmail(), appUser.getBio(), appUser.getRole());
     }
 
     private Following toEntity(AppUser follower, AppUser followee) {

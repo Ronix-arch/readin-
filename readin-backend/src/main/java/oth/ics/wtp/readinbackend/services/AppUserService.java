@@ -1,10 +1,10 @@
 package oth.ics.wtp.readinbackend.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import oth.ics.wtp.readinbackend.ClientErrors;
-import oth.ics.wtp.readinbackend.WeakCrypto;
 import oth.ics.wtp.readinbackend.dtos.AppUserDto;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
 import oth.ics.wtp.readinbackend.dtos.UpdateAppUserDto;
@@ -17,11 +17,13 @@ import java.util.List;
 public class AppUserService {
     private final AppUserRepository appUserRepository;
     private final StorageService storageService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AppUserService(AppUserRepository appUserRepository, StorageService storageService) {
+    public AppUserService(AppUserRepository appUserRepository, StorageService storageService, PasswordEncoder passwordEncoder) {
         this.appUserRepository = appUserRepository;
         this.storageService = storageService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<AppUserDto> appUsersList() {
@@ -39,7 +41,8 @@ public class AppUserService {
                 appUser.getCreatedAt(),
                 appUser.getProfilePictureUrl(),
                 appUser.getEmail(),
-                appUser.getBio()
+                appUser.getBio(),
+                appUser.getRole()
         );
     }
 
@@ -57,7 +60,7 @@ public class AppUserService {
     }
 
     private AppUser toEntity(CreateAppUserDto createAppUser) {
-        String hashedPassword = WeakCrypto.hashPassword(createAppUser.password());
+        String hashedPassword = passwordEncoder.encode(createAppUser.password());
         return new AppUser(createAppUser.name(), hashedPassword);
     }
 
