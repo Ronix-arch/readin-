@@ -1,26 +1,36 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { Routes, Route, Link, useNavigate, Navigate } from "react-router-dom";
 import Login from "./Login.jsx";
 import Users from "./AppUsers.jsx";
 import TimelinePosts from "./TimelinePosts.jsx";
 import UserProfile from "./UserProfile.jsx";
+import NotificationList from "./NotificationList.jsx";
+import ChatWindow from "./ChatWindow.jsx";
+import { useParams } from "react-router-dom";
+
+// Wrapper for ChatWindow to use useParams
+function ChatWindowWrapper({ auth }) {
+    const { userId } = useParams();
+    return <ChatWindow auth={auth} otherUserId={userId} />;
+}
+
+// Wrapper for UserProfile to use useParams
+function UserProfileWrapper({ auth }) {
+    const { userId } = useParams();
+    return <UserProfile auth={auth} userId={userId} />;
+}
 
 export default function ReadinFrontend() {
     const [auth, setAuth] = useState({ id: null, name: null, password: null, loggedIn: false });
-    const [view, setView] = useState("login");
-    const [profileUserId, setProfileUserId] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (auth.loggedIn) {
-            setView("timeline");
+            navigate("/");
         } else {
-            setView("login");
+            navigate("/login");
         }
     }, [auth.loggedIn]);
-
-    const handleNavigateToProfile = (userId) => {
-        setProfileUserId(userId);
-        setView("userProfile");
-    };
 
     const handleLogout = () => {
         setAuth({ id: null, name: null, password: null, loggedIn: false });
@@ -32,27 +42,37 @@ export default function ReadinFrontend() {
                 <nav>
                     <ul>
                         <li>
-                            <a href="#" onClick={() => setView("timeline")} style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+                            <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
                                 <img src="/appIcon.png" alt="ReadIn Icon" style={{ width: "40px", height: "40px", marginRight: "10px" }} />
                                 <strong style={{ fontSize: "1.5rem", fontStyle: "italic" }}>ReadIn</strong>
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                     {auth.loggedIn && (
                         <ul>
-                            <li><a href="#" onClick={() => setView("timeline")}>Timeline</a></li>
-                            <li><a href="#" onClick={() => setView("users")}>Search Users</a></li>
-                            <li><a href="#" onClick={() => handleNavigateToProfile(auth.id)}>My Profile</a></li>
+                            <li><Link to="/">Timeline</Link></li>
+                            <li><Link to="/users">Search Users</Link></li>
+                            <li><Link to={`/profile/${auth.id}`}>My Profile</Link></li>
+                            <li><Link to="/notifications">Notifications</Link></li>
                             <li><a href="#" onClick={handleLogout}>Log out</a></li>
                         </ul>
                     )}
                 </nav>
             </header>
             <main className="container">
-                {view === "login" && <Login setAuth={setAuth} />}
-                {view === "timeline" && <TimelinePosts auth={auth} userId={auth.id} />}
-                {view === "users" && <Users auth={auth} onNavigateToProfile={handleNavigateToProfile} />}
-                {view === "userProfile" && <UserProfile auth={auth} userId={profileUserId} onNavigateToProfile={handleNavigateToProfile} />}
+                <Routes>
+                    <Route path="/login" element={<Login setAuth={setAuth} />} />
+                    {auth.loggedIn && (
+                        <>
+                            <Route path="/" element={<TimelinePosts auth={auth} userId={auth.id} />} />
+                            <Route path="/users" element={<Users auth={auth} />} />
+                            <Route path="/profile/:userId" element={<UserProfileWrapper auth={auth} />} />
+                            <Route path="/notifications" element={<NotificationList auth={auth} />} />
+                            <Route path="/messages/:userId" element={<ChatWindowWrapper auth={auth} />} />
+                        </>
+                    )}
+                    <Route path="*" element={<Navigate to={auth.loggedIn ? "/" : "/login"} />} />
+                </Routes>
             </main>
             <footer className="container">
                 <p> Express Yourself. The Space is yours @ Readin </p>

@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Api } from "./Context.js";
 import { basic, basicJson } from "./Headers.js";
 
@@ -22,10 +23,10 @@ function EditProfileForm({ user, auth, onProfileUpdate }) {
             headers: basic(auth),
             body: formData,
         })
-        .then(res => res.json())
-        .then(updatedUser => {
-            onProfileUpdate(updatedUser);
-        });
+            .then(res => res.json())
+            .then(updatedUser => {
+                onProfileUpdate(updatedUser);
+            });
     };
 
     return (
@@ -44,8 +45,9 @@ function EditProfileForm({ user, auth, onProfileUpdate }) {
     );
 }
 
-export default function UserProfileInfo({ auth, userId, onNavigateToProfile }) {
+export default function UserProfileInfo({ auth, userId }) {
     const api = useContext(Api);
+    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
@@ -55,6 +57,7 @@ export default function UserProfileInfo({ auth, userId, onNavigateToProfile }) {
     const [showFollowing, setShowFollowing] = useState(false);
 
     useEffect(() => {
+        if (!userId) return;
         fetch(`${api}/appUsers/${userId}`, { headers: basic(auth) })
             .then(res => res.json())
             .then(setUser);
@@ -100,9 +103,14 @@ export default function UserProfileInfo({ auth, userId, onNavigateToProfile }) {
                     {isEditing ? "Cancel" : "Edit Profile"}
                 </button>
             ) : (
-                <button onClick={handleFollow}>
-                    {isFollowing ? "Unfollow" : "Follow"}
-                </button>
+                <>
+                    <button onClick={handleFollow}>
+                        {isFollowing ? "Unfollow" : "Follow"}
+                    </button>
+                    <button onClick={() => navigate(`/messages/${userId}`)} style={{ marginLeft: '10px' }}>
+                        Message
+                    </button>
+                </>
             )}
 
             {isEditing && <EditProfileForm user={user} auth={auth} onProfileUpdate={handleProfileUpdate} />}
@@ -113,7 +121,7 @@ export default function UserProfileInfo({ auth, userId, onNavigateToProfile }) {
                 </button>
                 {showFollowers && (
                     <ul>
-                        {followers.map(f => <li key={f.id} onClick={() => onNavigateToProfile(f.id)}><a href="#">{f.name}</a></li>)}
+                        {followers.map(f => <li key={f.id}><Link to={`/profile/${f.id}`}>{f.name}</Link></li>)}
                     </ul>
                 )}
             </div>
@@ -123,7 +131,7 @@ export default function UserProfileInfo({ auth, userId, onNavigateToProfile }) {
                 </button>
                 {showFollowing && (
                     <ul>
-                        {following.map(f => <li key={f.id} onClick={() => onNavigateToProfile(f.id)}><a href="#">{f.name}</a></li>)}
+                        {following.map(f => <li key={f.id}><Link to={`/profile/${f.id}`}>{f.name}</Link></li>)}
                     </ul>
                 )}
             </div>

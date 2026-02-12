@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Api } from "./Context.js";
 import { basic } from "./Headers.js";
 
@@ -43,8 +44,8 @@ export default function Users({ auth, onNavigateToProfile }) {
                     <h5>Search Results:</h5>
                     <ul>
                         {searchResults.map(u => (
-                            <li key={u.id} onClick={() => onNavigateToProfile(u.id)}>
-                                <a href="#">{u.name}</a>
+                            <li key={u.id}>
+                                <Link to={`/profile/${u.id}`}>{u.name}</Link>
                             </li>
                         ))}
                     </ul>
@@ -54,8 +55,8 @@ export default function Users({ auth, onNavigateToProfile }) {
                     <h5>All Users:</h5>
                     <ul>
                         {users.map(u => (
-                            <li key={u.id} onClick={() => onNavigateToProfile(u.id)}>
-                                <a href="#">{u.name}</a>
+                            <li key={u.id}>
+                                <Link to={`/profile/${u.id}`}>{u.name}</Link>
                             </li>
                         ))}
                     </ul>

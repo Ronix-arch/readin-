@@ -35,7 +35,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in this stateless API
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/appUsers").permitAll() // Allow user creation
+                        .requestMatchers("/appUsers", "/files/**").permitAll() // Allow user creation and static
+                                                                               // uploads
                         .anyRequest().authenticated() // All other requests require authentication
                 )
                 .httpBasic(); // Use HTTP Basic authentication
