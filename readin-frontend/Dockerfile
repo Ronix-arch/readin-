@@ -4,6 +4,7 @@ COPY package*.json ./
 RUN npm install
 COPY ./ ./
 # The API URL is no longer needed here, as Nginx will handle the proxy.
+ARG NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
 FROM nginx:stable-alpine

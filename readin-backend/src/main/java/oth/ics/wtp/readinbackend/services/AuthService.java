@@ -1,20 +1,17 @@
 package oth.ics.wtp.readinbackend.services;
 
-
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import oth.ics.wtp.readinbackend.ClientErrors;
-import oth.ics.wtp.readinbackend.WeakCrypto;
 import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.repositories.AppUserRepository;
-import org.springframework.http.HttpHeaders;
-
-import java.util.Optional;
 
 @Service
 public class AuthService {
-    private static final String  SESSION_USER_NAME = "readin-session-user-name";
     private final AppUserRepository appUserRepository;
 
     @Autowired
@@ -23,41 +20,25 @@ public class AuthService {
     }
 
     public AppUser getAuthenticatedUser(HttpServletRequest request) {
-        Object sessionUserName = request.getSession().getAttribute(SESSION_USER_NAME);
-        if (sessionUserName instanceof String userName) {
-            Optional<AppUser> appUser = appUserRepository.findByName(userName);
-            if (appUser.isPresent()) {
-                return appUser.get();
-            } else {
-                logOut(request);
-                throw ClientErrors.unauthorized();
-            }
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
+            return appUserRepository.findByName(authentication.getName())
+                    .orElseThrow(ClientErrors::unauthorized);
         }
-        return logIn(request);
+        throw ClientErrors.unauthorized();
     }
+
     public AppUser logIn(HttpServletRequest request) {
-        try {
-            String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            String decoded = WeakCrypto.base64decode(authHeader.substring(authHeader.indexOf(" ")+1));
-            String [] parts = decoded.split(":");
-            String username = parts[0];
-            String password = parts[1];
-            String hashedPassword = WeakCrypto.hashPassword(password);
-            AppUser appUser = appUserRepository.findByName(username).orElseThrow();
-            if (!appUser.getPassword().equals(hashedPassword)) {
-                throw new Exception();
-            }
-            request.getSession().setAttribute(SESSION_USER_NAME, username);
-            return appUser;
-        } catch (Exception e){
-            logOut(request);
-            throw ClientErrors.unauthorized();
-        }
-
+        // With Spring Security HTTP Basic, if we reach here, the user is already authenticated.
+        // We just need to return the user object.
+        return getAuthenticatedUser(request);
     }
+
     public void logOut(HttpServletRequest request) {
-        request.getSession().setAttribute(SESSION_USER_NAME, null);
+        SecurityContextHolder.clearContext();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
     }
-
 }

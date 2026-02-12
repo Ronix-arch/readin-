@@ -6,28 +6,24 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.repositories.AppUserRepository;
+
+import java.util.Collections;
 
 @Service
 public class AppUserDetailsService implements UserDetailsService {
 
-    private final AppUserRepository appUserRepository;
-
     @Autowired
-    public AppUserDetailsService(AppUserRepository appUserRepository) {
-        this.appUserRepository = appUserRepository;
-    }
+    private AppUserRepository appUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser appUser = appUserRepository.findByName(username)
+        return appUserRepository.findByName(username)
+                .map(u -> new User(
+                        u.getName(),
+                        u.getPassword(),
+                        Collections.emptyList() // Roles would go here if needed
+                ))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-
-        return User.builder()
-                .username(appUser.getName())
-                .password(appUser.getPassword())
-                .roles(appUser.getRole().name())
-                .build();
     }
 }

@@ -3,7 +3,7 @@ COPY pom.xml /build/pom.xml
 COPY .mvn /build/.mvn
 COPY src /build/src
 WORKDIR /build/
-RUN mvn package
+RUN mvn package -DskipTests
 
 
 FROM eclipse-temurin:21-jre

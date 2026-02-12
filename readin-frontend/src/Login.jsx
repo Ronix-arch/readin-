@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Api } from "./Context.js";
-import { basicJson, makeBasic } from "./Headers.js";
+import { anonJson, makeBasic } from "./Headers.js";
 
 export default function Login({ setAuth }) {
     const api = useContext(Api);
@@ -19,7 +19,6 @@ export default function Login({ setAuth }) {
             throw new Error("Error in logging in");
         })
         .then(user => {
-            // This is the fix: include loggedIn: true
             setAuth({ ...user, password, loggedIn: true });
         })
         .catch(error => console.error("Error in logging in: ", error));
@@ -29,7 +28,7 @@ export default function Login({ setAuth }) {
         const newUserData = { name, password };
         fetch(api + "/appUsers", {
             method: "POST",
-            headers: basicJson({ name: "unused", password: "unused" }), // Creating a user is a public action
+            headers: anonJson(), // This is the fix: Do not send any Authorization header
             body: JSON.stringify(newUserData)
         })
         .then(response => {
@@ -37,7 +36,6 @@ export default function Login({ setAuth }) {
             throw new Error("Error in creating user");
         })
         .then(user => {
-            // This is the fix: include loggedIn: true
             setAuth({ ...user, password, loggedIn: true });
         })
         .catch(error => console.error("Error in creating user: ", error));

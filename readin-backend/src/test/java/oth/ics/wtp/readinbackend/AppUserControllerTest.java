@@ -6,7 +6,6 @@ import org.springframework.web.server.ResponseStatusException;
 import oth.ics.wtp.readinbackend.controllers.AppUserController;
 import oth.ics.wtp.readinbackend.dtos.AppUserDto;
 import oth.ics.wtp.readinbackend.dtos.CreateAppUserDto;
-import oth.ics.wtp.readinbackend.services.AppUserService;
 
 import java.util.List;
 
@@ -15,8 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AppUserControllerTest extends ReadinControllerTestBase {
     @Autowired
     private AppUserController appUserController;
-    @Autowired
-    private AppUserService appUserService;
 
 
     @Test
