@@ -11,48 +11,56 @@ import oth.ics.wtp.readinbackend.repositories.AppUserRepository;
 import oth.ics.wtp.readinbackend.repositories.LikeRepository;
 import oth.ics.wtp.readinbackend.repositories.PostRepository;
 
-@Service public class LikeService {
-    private final LikeRepository likeRepository;
-    private final PostRepository postRepository;
-    private final AppUserRepository appUserRepository;
+@Service
+public class LikeService {
+  private final LikeRepository likeRepository;
+  private final PostRepository postRepository;
+  private final AppUserRepository appUserRepository;
+  private final NotificationService notificationService;
 
-  @Autowired public LikeService(LikeRepository likeRepository, PostRepository postRepository, AppUserRepository appUserRepository) {
-      this.likeRepository = likeRepository;
-      this.postRepository = postRepository;
-      this.appUserRepository = appUserRepository;
+  @Autowired
+  public LikeService(LikeRepository likeRepository, PostRepository postRepository, AppUserRepository appUserRepository,
+      NotificationService notificationService) {
+    this.likeRepository = likeRepository;
+    this.postRepository = postRepository;
+    this.appUserRepository = appUserRepository;
+    this.notificationService = notificationService;
 
   }
-    public void likePost( long appUserId, Long postId) {
-        if (likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId)) {
-            throw ClientErrors.userAlreadyLikedPost(appUserId,postId);
-        }
 
-            AppUser appUser = appUserRepository.findById(appUserId).orElseThrow(()-> ClientErrors.userIdNotFound(appUserId));
-            Post post = postRepository.findById(postId).orElseThrow(()-> ClientErrors.postNotFound(postId));
-            Like like = toEntity(appUser,post);
-            likeRepository.save(like);
-
+  public void likePost(long appUserId, Long postId) {
+    if (likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId)) {
+      throw ClientErrors.userAlreadyLikedPost(appUserId, postId);
     }
 
-    private Like toEntity( AppUser appUser, Post post) {
-      return new Like(appUser,post);
-    }
-    @Transactional
-    public void unlikePost(long appUserId, Long postId) {
-        likeRepository.deleteByAppUser_IdAndPost_Id(appUserId, postId);
-    }
-    public boolean hasUserLikedPost(long  appUserId, Long postId) {
-        return likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId);
-    }
-    public int getLikeCount(Long postId) {
-      return likeRepository.countByPost_Id(postId);
+    AppUser appUser = appUserRepository.findById(appUserId).orElseThrow(() -> ClientErrors.userIdNotFound(appUserId));
+    Post post = postRepository.findById(postId).orElseThrow(() -> ClientErrors.postNotFound(postId));
+    Like like = toEntity(appUser, post);
+    likeRepository.save(like);
+
+    // Create notification
+    if (!post.getAppUser().getId().equals(appUserId)) {
+      notificationService.createNotification(post.getAppUser(), "LIKE",
+          appUser.getName() + " liked your post", postId);
     }
 
+  }
 
+  private Like toEntity(AppUser appUser, Post post) {
+    return new Like(appUser, post);
+  }
 
+  @Transactional
+  public void unlikePost(long appUserId, Long postId) {
+    likeRepository.deleteByAppUser_IdAndPost_Id(appUserId, postId);
+  }
 
+  public boolean hasUserLikedPost(long appUserId, Long postId) {
+    return likeRepository.existsByAppUser_IdAndPost_Id(appUserId, postId);
+  }
 
-
-
+  public int getLikeCount(Long postId) {
+    return likeRepository.countByPost_Id(postId);
+  }
 
 }

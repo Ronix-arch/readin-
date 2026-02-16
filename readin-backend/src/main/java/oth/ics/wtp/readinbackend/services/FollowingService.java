@@ -16,21 +16,30 @@ import java.util.List;
 public class FollowingService {
     private final FollowingRepository followingRepository;
     private final AppUserRepository appUserRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public FollowingService(FollowingRepository followingRepository, AppUserRepository appUserRepository) {
+    public FollowingService(FollowingRepository followingRepository, AppUserRepository appUserRepository,
+            NotificationService notificationService) {
         this.followingRepository = followingRepository;
         this.appUserRepository = appUserRepository;
+        this.notificationService = notificationService;
     }
 
     public void followUser(long followerId, long followeeId) {
         if (followingRepository.existsByFollowerIdAndFolloweeId(followerId, followeeId)) {
             throw ClientErrors.followingAlreadyExsists(followerId, followeeId);
         }
-        AppUser follower = appUserRepository.findById(followerId).orElseThrow(() -> ClientErrors.userIdNotFound(followerId));
-        AppUser followee = appUserRepository.findById(followeeId).orElseThrow(() -> ClientErrors.userIdNotFound(followeeId));
+        AppUser follower = appUserRepository.findById(followerId)
+                .orElseThrow(() -> ClientErrors.userIdNotFound(followerId));
+        AppUser followee = appUserRepository.findById(followeeId)
+                .orElseThrow(() -> ClientErrors.userIdNotFound(followeeId));
         Following following = toEntity(follower, followee);
         followingRepository.save(following);
+
+        // Create notification
+        notificationService.createNotification(followee, "FOLLOW",
+                follower.getName() + " started following you", followerId);
 
     }
 
@@ -65,11 +74,11 @@ public class FollowingService {
                         .orElseThrow(() -> ClientErrors.userIdNotFound(f.getFollower().getId())))
                 .toList();
 
-
     }
 
     private AppUserDto convertToDto(AppUser appUser) {
-        return new AppUserDto(appUser.getId(), appUser.getName(), appUser.getCreatedAt(), appUser.getProfilePictureUrl(), appUser.getEmail(), appUser.getBio(), appUser.getRole());
+        return new AppUserDto(appUser.getId(), appUser.getName(), appUser.getCreatedAt(),
+                appUser.getProfilePictureUrl(), appUser.getEmail(), appUser.getBio(), appUser.getRole());
     }
 
     private Following toEntity(AppUser follower, AppUser followee) {

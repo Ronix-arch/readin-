@@ -8,6 +8,28 @@ export default function NotificationList({ auth }) {
 
     useEffect(() => {
         if (!auth.id) return;
+        // Verify if context Api includes /api or not. 
+        // In Login.jsx: fetch(api + "/appUsers/login"
+        // In ChatWindow.jsx: fetch(api + "/messages/"
+        // If api is "http://localhost", then we need "/api/notifications" if Nginx is stripping it, or "/notifications" if Nginx is gone?
+        // Wait, I reverted Nginx to `proxy_pass http://backend:8080/;`. This STRIPS the matching part.
+        // If location is `/api/`, then `http://localhost/api/notifications` becomes `http://backend:8080/notifications`.
+        // So the backend path MUST be `/notifications`.
+        // NotificationController has `@RequestMapping("/notifications")`. So that is correct.
+
+        // However, let's check what `Api` context value is. 
+        // Typically it is `http://localhost/api` or `http://localhost`.
+        // If it is `http://localhost/api`, then `api + "/notifications"` = `http://localhost/api/notifications`. 
+        // Request goes to Nginx `/api/notifications`. 
+        // Nginx strips `/api/` -> `http://backend:8080/notifications`.
+        // Backend handles `/notifications`. This seems correct.
+
+        // BUT, if I changed ChatController to remove `/api`, maybe I should check if NotificationController needs change?
+        // NotificationController is `@RequestMapping("/notifications")`. It does NOT have `/api`.
+        // So `http://backend:8080/notifications` is correct.
+
+        // The issue is likely the `@AuthenticationPrincipal AppUser` returning null, same as ChatController.
+
         fetch(api + "/notifications", { headers: basic(auth) })
             .then(res => res.json())
             .then(data => setNotifications(data))

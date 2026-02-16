@@ -20,12 +20,15 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final AppUserRepository appUserRepository;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, AppUserRepository appUserRepository, PostRepository postRepository) {
+    public CommentService(CommentRepository commentRepository, AppUserRepository appUserRepository,
+            PostRepository postRepository, NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.appUserRepository = appUserRepository;
         this.postRepository = postRepository;
+        this.notificationService = notificationService;
     }
 
     public Page<CommentDto> getCommentsByPost(Long postId, Pageable pageable) {
@@ -52,6 +55,22 @@ public class CommentService {
 
         Comment comment = new Comment(createCommentDto.content(), author, post, parentComment);
         Comment savedComment = commentRepository.save(comment);
+
+        // Create notification for post author
+        if (!post.getAppUser().getId().equals(authorId)) {
+            notificationService.createNotification(post.getAppUser(), "COMMENT",
+                    author.getName() + " commented on your post", postId);
+        }
+
+        // Notify parent comment author if it's a reply and not their own reply
+        if (parentComment != null && !parentComment.getAuthor().getId().equals(authorId)) {
+            // Avoid double notification if post author is same as parent comment author
+            if (!parentComment.getAuthor().getId().equals(post.getAppUser().getId())) {
+                notificationService.createNotification(parentComment.getAuthor(), "COMMENT",
+                        author.getName() + " replied to your comment", postId);
+            }
+        }
+
         return CommentDto.fromEntity(savedComment);
     }
 }

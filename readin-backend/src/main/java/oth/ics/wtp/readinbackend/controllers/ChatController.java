@@ -62,6 +62,9 @@ public class ChatController {
         return ResponseEntity.ok(messageService.getRecentConversations(userDetails.getAppUser()));
     }
 
+    @Autowired
+    private oth.ics.wtp.readinbackend.services.NotificationService notificationService;
+
     // WebSocket endpoint: /app/chat
     @MessageMapping("/chat")
     public void processMessage(@Payload Map<String, Object> payload) {
@@ -84,6 +87,11 @@ public class ChatController {
             messagingTemplate.convertAndSendToUser(
                     sender.getName(), "/queue/messages",
                     savedMsg);
+
+            // Create notification for receiver
+            notificationService.createNotification(receiver, "MESSAGE",
+                    sender.getName() + " sent you a message", senderId); // relatedEntityId could be senderId or
+                                                                         // messageId
         }
     }
 }

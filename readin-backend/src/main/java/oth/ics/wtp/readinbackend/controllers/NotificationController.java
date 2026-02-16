@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.entities.Notification;
+import oth.ics.wtp.readinbackend.services.CustomUserDetails;
 import oth.ics.wtp.readinbackend.services.NotificationService;
 
 import java.util.List;
@@ -20,10 +21,11 @@ public class NotificationController {
     // NOTE: This assumes @AuthenticationPrincipal resolves to your AppUser or a
     // UserDetails that you can use to fetch the AppUser.
     @GetMapping
-    public ResponseEntity<List<Notification>> getNotifications(@AuthenticationPrincipal AppUser user) {
-        // If your @AuthenticationPrincipal isn't AppUser automatically, you might need
-        // to fetch it via UserService
-        return ResponseEntity.ok(notificationService.getUserNotifications(user));
+    public ResponseEntity<List<Notification>> getNotifications(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(notificationService.getUserNotifications(userDetails.getAppUser()));
     }
 
     @PostMapping("/{id}/read")
