@@ -15,6 +15,9 @@ public interface PrivateMessageRepository extends JpaRepository<PrivateMessage, 
     @Query("SELECT m FROM PrivateMessage m WHERE m.receiver = :user AND m.isRead = false")
     List<PrivateMessage> findUnreadMessages(@Param("user") AppUser user);
 
-    @Query("SELECT DISTINCT (CASE WHEN m.sender = :user THEN m.receiver ELSE m.sender END) FROM PrivateMessage m WHERE m.sender = :user OR m.receiver = :user")
+    // Find all users who have sent messages to me OR received messages from me
+    @Query("SELECT DISTINCT u FROM AppUser u WHERE " +
+            "u IN (SELECT m.sender FROM PrivateMessage m WHERE m.receiver = :user) OR " +
+            "u IN (SELECT m.receiver FROM PrivateMessage m WHERE m.sender = :user)")
     List<AppUser> findConversations(@Param("user") AppUser user);
 }

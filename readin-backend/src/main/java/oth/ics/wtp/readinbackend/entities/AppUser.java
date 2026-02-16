@@ -26,11 +26,12 @@ public class AppUser {
     private String bio;
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Set<Following> following = new HashSet<>();
 
     @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Set<Following> followers = new HashSet<>();
-
 
     public AppUser() {
     }
