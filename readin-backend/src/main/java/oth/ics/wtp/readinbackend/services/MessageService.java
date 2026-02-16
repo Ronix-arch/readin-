@@ -21,6 +21,10 @@ public class MessageService {
         return messageRepository.findConversation(user1, user2);
     }
 
+    public List<AppUser> getRecentConversations(AppUser user) {
+        return messageRepository.findConversations(user);
+    }
+
     @Transactional
     public void markMessagesAsRead(AppUser receiver, AppUser sender) {
         List<PrivateMessage> conversation = messageRepository.findConversation(receiver, sender); // Optimization needed

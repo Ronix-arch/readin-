@@ -6,6 +6,7 @@ import TimelinePosts from "./TimelinePosts.jsx";
 import UserProfile from "./UserProfile.jsx";
 import NotificationList from "./NotificationList.jsx";
 import ChatWindow from "./ChatWindow.jsx";
+import Inbox from "./Inbox.jsx";
 import { useParams } from "react-router-dom";
 
 // Wrapper for ChatWindow to use useParams
@@ -52,6 +53,7 @@ export default function ReadinFrontend() {
                         <ul>
                             <li><Link to="/">Timeline</Link></li>
                             <li><Link to="/users">Search Users</Link></li>
+                            <li><Link to="/messages" title="Inbox">Messages</Link></li>
                             <li><Link to={`/profile/${auth.id}`}>My Profile</Link></li>
                             <li><Link to="/notifications">Notifications</Link></li>
                             <li><a href="#" onClick={handleLogout}>Log out</a></li>
@@ -68,6 +70,7 @@ export default function ReadinFrontend() {
                             <Route path="/users" element={<Users auth={auth} />} />
                             <Route path="/profile/:userId" element={<UserProfileWrapper auth={auth} />} />
                             <Route path="/notifications" element={<NotificationList auth={auth} />} />
+                            <Route path="/messages" element={<Inbox auth={auth} />} />
                             <Route path="/messages/:userId" element={<ChatWindowWrapper auth={auth} />} />
                         </>
                     )}

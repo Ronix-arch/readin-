@@ -27,6 +27,10 @@ export default function ChatWindow({ auth, otherUserId }) {
         const client = new Client({
             // brokerURL: 'ws://localhost:8080/ws', // Not used with SockJS
             webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+            connectHeaders: {
+                login: auth.name,
+                passcode: auth.password
+            },
             onConnect: () => {
                 console.log("Connected to WebSocket");
                 client.subscribe("/user/" + auth.name + "/queue/messages", (msg) => {
@@ -61,9 +65,24 @@ export default function ChatWindow({ auth, otherUserId }) {
     useEffect(() => {
         if (!otherUserId) return;
         fetch(api + "/messages/" + otherUserId, { headers: basic(auth) })
-            .then(res => res.json())
-            .then(data => setMessages(data))
-            .catch(err => console.error("Error fetching messages:", err));
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setMessages(data);
+                } else {
+                    console.error("Expected array of messages, got:", data);
+                    setMessages([]);
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching messages:", err);
+                setMessages([]);
+            });
     }, [api, auth, otherUserId]);
 
     const sendMessage = () => {

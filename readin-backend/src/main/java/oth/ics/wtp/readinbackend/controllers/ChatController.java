@@ -14,6 +14,7 @@ import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.entities.PrivateMessage;
 import oth.ics.wtp.readinbackend.repositories.AppUserRepository;
 import oth.ics.wtp.readinbackend.services.MessageService;
+import oth.ics.wtp.readinbackend.services.CustomUserDetails;
 
 import java.util.List;
 import java.util.Map;
@@ -31,15 +32,34 @@ public class ChatController {
     private AppUserRepository appUserRepository;
 
     // REST endpoint to get conversation history
-    @GetMapping("/api/messages/{userId}")
+    @GetMapping("/messages/{userId}")
     @ResponseBody
-    public ResponseEntity<List<PrivateMessage>> getConversation(@AuthenticationPrincipal AppUser currentUser,
+    public ResponseEntity<List<PrivateMessage>> getConversation(@AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long userId) {
+        if (userDetails == null) {
+            System.out.println("UserDetails is null");
+            return ResponseEntity.status(401).build();
+        }
+        AppUser currentUser = userDetails.getAppUser();
+        System.out.println("Fetching conversation with user ID: " + userId);
+        System.out.println("Current user ID: " + currentUser.getId());
+
         AppUser otherUser = appUserRepository.findById(userId).orElse(null);
         if (otherUser == null) {
+            System.out.println("Other user not found, ID: " + userId);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(messageService.getConversation(currentUser, otherUser));
+    }
+
+    // REST endpoint to get list of conversations (Inbox)
+    @GetMapping("/messages/conversations")
+    @ResponseBody
+    public ResponseEntity<List<AppUser>> getConversations(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(messageService.getRecentConversations(userDetails.getAppUser()));
     }
 
     // WebSocket endpoint: /app/chat
