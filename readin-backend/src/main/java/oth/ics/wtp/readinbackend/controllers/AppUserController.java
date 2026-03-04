@@ -1,6 +1,5 @@
 package oth.ics.wtp.readinbackend.controllers;
 
-
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,14 +52,14 @@ public class AppUserController {
     }
 
     @SecurityRequirement(name = "basicAuth")
-    @PutMapping(value = "appUsers/{appUserId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(value = "appUsers/{appUserId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public AppUserDto updateUser(
             HttpServletRequest request,
             @PathVariable("appUserId") Long appUserId,
             @RequestPart("updateDto") UpdateAppUserDto updateDto,
             @RequestPart(value = "file", required = false) MultipartFile file) {
         AppUser authenticatedUser = authService.getAuthenticatedUser(request);
-        if (!authenticatedUser.getId().equals(appUserId)) {
+        if (!authenticatedUser.getId().equals(appUserId) && !authService.isAdmin(authenticatedUser)) {
             throw new SecurityException("You can only update your own profile.");
         }
         return appUserService.updateUser(appUserId, updateDto, file);
@@ -70,10 +69,12 @@ public class AppUserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "appUsers/{appUserName}")
     public void deleteAppUser(HttpServletRequest request, @PathVariable("appUserName") String appUserName) {
-        authService.getAuthenticatedUser(request);
+        AppUser authenticatedUser = authService.getAuthenticatedUser(request);
+        if (!authenticatedUser.getName().equals(appUserName) && !authService.isAdmin(authenticatedUser)) {
+            throw new SecurityException("You can only delete your own profile.");
+        }
         appUserService.delete(appUserName);
     }
-
 
     @SecurityRequirement(name = "basicAuth")
     @PostMapping(value = "appUsers/login")
@@ -81,8 +82,6 @@ public class AppUserController {
         AppUser appUser = authService.logIn(request);
         return appUserService.get(appUser.getName());
     }
-
-
 
     @SecurityRequirement(name = "basicAuth")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -7,6 +7,7 @@ import UserProfile from "./UserProfile.jsx";
 import NotificationList from "./NotificationList.jsx";
 import ChatWindow from "./ChatWindow.jsx";
 import Inbox from "./Inbox.jsx";
+import AdminDashboard from "./AdminDashboard.jsx"; // Added AdminDashboard
 import { useParams } from "react-router-dom";
 
 // Wrapper for ChatWindow to use useParams
@@ -56,6 +57,7 @@ export default function ReadinFrontend() {
                             <li><Link to="/messages" title="Inbox">Messages</Link></li>
                             <li><Link to={`/profile/${auth.id}`}>My Profile</Link></li>
                             <li><Link to="/notifications">Notifications</Link></li>
+                            {auth.role === 'ADMIN' && <li><Link to="/admin">Admin Dashboard</Link></li>}
                             <li><a href="#" onClick={handleLogout}>Log out</a></li>
                         </ul>
                     )}
@@ -72,6 +74,7 @@ export default function ReadinFrontend() {
                             <Route path="/notifications" element={<NotificationList auth={auth} />} />
                             <Route path="/messages" element={<Inbox auth={auth} />} />
                             <Route path="/messages/:userId" element={<ChatWindowWrapper auth={auth} />} />
+                            {auth.role === 'ADMIN' && <Route path="/admin" element={<AdminDashboard auth={auth} />} />}
                         </>
                     )}
                     <Route path="*" element={<Navigate to={auth.loggedIn ? "/" : "/login"} />} />

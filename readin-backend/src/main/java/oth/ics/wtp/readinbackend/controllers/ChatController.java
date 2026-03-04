@@ -67,15 +67,26 @@ public class ChatController {
 
     // WebSocket endpoint: /app/chat
     @MessageMapping("/chat")
-    public void processMessage(@Payload Map<String, Object> payload) {
+    public void processMessage(@Payload Map<String, Object> payload,
+            org.springframework.security.core.Authentication authentication) {
         Long senderId = Long.valueOf(payload.get("senderId").toString());
         Long receiverId = Long.valueOf(payload.get("receiverId").toString());
         String content = (String) payload.get("content");
+
+        if (authentication == null) {
+            return; // Or handle unauthenticated
+        }
 
         AppUser sender = appUserRepository.findById(senderId).orElse(null);
         AppUser receiver = appUserRepository.findById(receiverId).orElse(null);
 
         if (sender != null && receiver != null) {
+            AppUser authenticatedUser = appUserRepository.findByName(authentication.getName()).orElse(null);
+            if (authenticatedUser == null || (!authenticatedUser.getId().equals(senderId)
+                    && authenticatedUser.getRole() != oth.ics.wtp.readinbackend.entities.UserRole.ADMIN)) {
+                return; // Unauthorized
+            }
+
             PrivateMessage savedMsg = messageService.saveMessage(new PrivateMessage(sender, receiver, content));
 
             // Send to receiver

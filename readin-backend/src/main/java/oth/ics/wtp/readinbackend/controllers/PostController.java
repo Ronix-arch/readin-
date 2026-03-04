@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import oth.ics.wtp.readinbackend.dtos.PostDto;
 import oth.ics.wtp.readinbackend.dtos.UpdatePostDto;
+import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.services.AuthService;
 import oth.ics.wtp.readinbackend.services.PostService;
 
@@ -28,14 +29,16 @@ public class PostController {
     }
 
     @GetMapping(value = "appUsers/{appUserId}/posts/ownPosts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<PostDto> getOwnPosts(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+    public Page<PostDto> getOwnPosts(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
         authService.getAuthenticatedUser(request);
         Pageable pageable = PageRequest.of(page, size);
         return postService.getUserOwnPosts(appUserId, pageable);
     }
 
     @GetMapping(value = "appUsers/{appUserId}/posts/timeLinePosts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<PostDto> getTimeLinePosts(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size
+    public Page<PostDto> getTimeLinePosts(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size
 
     ) {
         authService.getAuthenticatedUser(request);
@@ -44,22 +47,36 @@ public class PostController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(value = "appUsers/{appUserId}/posts", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PostDto createPost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @RequestParam("content") String content, @RequestParam(value = "file", required = false) MultipartFile file) {
-        authService.getAuthenticatedUser(request);
+    @PostMapping(value = "appUsers/{appUserId}/posts", consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PostDto createPost(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @RequestParam("content") String content,
+            @RequestParam(value = "file", required = false) MultipartFile file) {
+        AppUser requester = authService.getAuthenticatedUser(request);
+        if (!requester.getId().equals(appUserId) && !authService.isAdmin(requester)) {
+            throw new SecurityException("Unauthorized");
+        }
         return postService.createPost(appUserId, content, file);
     }
 
     @PutMapping(value = "appUsers/{appUserId}/posts/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PostDto updatePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @PathVariable("postId") long postId, @RequestBody UpdatePostDto updatePostDto) {
-        authService.getAuthenticatedUser(request);
+    public PostDto updatePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @PathVariable("postId") long postId, @RequestBody UpdatePostDto updatePostDto) {
+        AppUser requester = authService.getAuthenticatedUser(request);
+        if (!requester.getId().equals(appUserId) && !authService.isAdmin(requester)) {
+            throw new SecurityException("Unauthorized");
+        }
         return postService.updatePost(appUserId, postId, updatePostDto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "appUsers/{appUserId}/posts/{postId}")
-    public void deletePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @PathVariable("postId") long postId) {
-        authService.getAuthenticatedUser(request);
+    public void deletePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @PathVariable("postId") long postId) {
+        AppUser requester = authService.getAuthenticatedUser(request);
+        if (!requester.getId().equals(appUserId) && !authService.isAdmin(requester)) {
+            throw new SecurityException("Unauthorized");
+        }
         postService.deletePost(appUserId, postId);
     }
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.services.AuthService;
 import oth.ics.wtp.readinbackend.services.LikeService;
 
@@ -21,24 +22,32 @@ public class LikeController {
         this.likeService = likeService;
     }
 
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "appUsers/{appUserId}/posts/{postId}/like", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void likePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @PathVariable("postId") long postId) {
-        authService.getAuthenticatedUser(request);
+    public void likePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @PathVariable("postId") long postId) {
+        AppUser requester = authService.getAuthenticatedUser(request);
+        if (!requester.getId().equals(appUserId) && !authService.isAdmin(requester)) {
+            throw new SecurityException("Unauthorized");
+        }
         likeService.likePost(appUserId, postId);
 
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "appUsers/{appUserId}/posts/{postId}/like")
-    public void unlikePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @PathVariable("postId") long postId) {
-        authService.getAuthenticatedUser(request);
+    public void unlikePost(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @PathVariable("postId") long postId) {
+        AppUser requester = authService.getAuthenticatedUser(request);
+        if (!requester.getId().equals(appUserId) && !authService.isAdmin(requester)) {
+            throw new SecurityException("Unauthorized");
+        }
         likeService.unlikePost(appUserId, postId);
     }
 
     @GetMapping(value = "appUsers/{appUserId}/posts/{postId}/like", produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean hasUserLikedPost(HttpServletRequest request, @PathVariable("appUserId") long appUserId, @PathVariable("postId") long postId) {
+    public boolean hasUserLikedPost(HttpServletRequest request, @PathVariable("appUserId") long appUserId,
+            @PathVariable("postId") long postId) {
         authService.getAuthenticatedUser(request);
         return likeService.hasUserLikedPost(appUserId, postId);
     }

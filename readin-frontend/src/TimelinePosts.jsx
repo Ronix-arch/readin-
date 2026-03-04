@@ -1,9 +1,9 @@
-import {useContext, useEffect, useState} from "react";
-import {Api} from "./Context.js";
-import {basic} from "./Headers.js";
+import { useContext, useEffect, useState } from "react";
+import { Api } from "./Context.js";
+import { basic } from "./Headers.js";
 import CommentSection from "./CommentSection.jsx";
 
-export default function TimelinePosts({auth, userId}) {
+export default function TimelinePosts({ auth, userId }) {
     const api = useContext(Api);
 
     const [posts, setPosts] = useState([]);
@@ -36,100 +36,111 @@ export default function TimelinePosts({auth, userId}) {
     }, [posts]);
 
     const toggleComments = (postId) => {
-        setShowComments(prev => ({...prev, [postId]: !prev[postId]}));
+        setShowComments(prev => ({ ...prev, [postId]: !prev[postId] }));
     };
 
+    function deletePost(appUserId, postId) {
+        if (!window.confirm("Are you sure you want to delete this post?")) return;
+        fetch(api + "/appUsers/" + appUserId + "/posts/" + postId, { headers: basic(auth), method: "DELETE" })
+            .then(response => {
+                if (!response.ok) throw new Error(response.statusText);
+            }).then(() => {
+                setPosts(prevPosts => prevPosts.filter(p => p.id !== postId));
+            }).catch(error => console.error("Error in deleting post: ", error));
+    }
+
     return (<>
-            <h1>Timeline</h1>
-            <h2> Your Followees' Posts 💬</h2>
-            {posts.map(p => (
-                <article key={p.id}>
-                    <header>
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                            {p.userProfilePictureUrl && <img src={`${api}/files/${p.userProfilePictureUrl}`} alt="Profile" style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "10px" }} />}
-                            <h5>@{p.userName}</h5>
-                        </div>
-                    </header>
-                    <p>{p.content}</p>
-                    {p.attachmentUrl && (
-                        p.attachmentType.startsWith("image/") ? (
-                            <img src={`${api}/files/${p.attachmentUrl}`} alt="Post attachment" style={{maxWidth: "100%"}}/>
-                        ) : p.attachmentType.startsWith("video/") ? (
-                            <video src={`${api}/files/${p.attachmentUrl}`} controls style={{maxWidth: "100%"}}/>
-                        ) : null
-                    )}
-                    <footer>
-                        <p>Posted
-                            on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
+        <h1>Timeline</h1>
+        <h2> Your Followees' Posts 💬</h2>
+        {posts.map(p => (
+            <article key={p.id}>
+                <header>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                        {p.userProfilePictureUrl && <img src={`${api}/files/${p.userProfilePictureUrl}`} alt="Profile" style={{ width: "40px", height: "40px", borderRadius: "50%", marginRight: "10px" }} />}
+                        <h5>@{p.userName}</h5>
+                    </div>
+                </header>
+                <p>{p.content}</p>
+                {p.attachmentUrl && (
+                    p.attachmentType.startsWith("image/") ? (
+                        <img src={`${api}/files/${p.attachmentUrl}`} alt="Post attachment" style={{ maxWidth: "100%" }} />
+                    ) : p.attachmentType.startsWith("video/") ? (
+                        <video src={`${api}/files/${p.attachmentUrl}`} controls style={{ maxWidth: "100%" }} />
+                    ) : null
+                )}
+                <footer>
+                    <p>Posted
+                        on: {new Date(p.createdAt).toLocaleDateString()} at {new Date(p.createdAt).toLocaleTimeString()}</p>
 
-                        <div className="grid">
-                            {likeStatus[p.id] !== undefined && (likeStatus[p.id] ?
-                                <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}>❤️</button> :
-                                <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}>🤍</button>
+                    <div className="grid">
+                        {likeStatus[p.id] !== undefined && (likeStatus[p.id] ?
+                            <button onClick={() => unlikePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}>❤️</button> :
+                            <button onClick={() => likePost(api, auth, setLikeStatus, setLikeCounts, userId, p.id)}>🤍</button>
 
-                            )}
-                            <p>Likes: {likeCounts[p.id] || 0}</p>
-                            <button onClick={() => toggleComments(p.id)}>
-                                {showComments[p.id] ? "Hide Comments" : `Comments (${p.commentCount})`}
-                            </button>
-                        </div>
-                        {showComments[p.id] && <CommentSection postId={p.id} auth={auth} />}
-                    </footer>
-                </article>
-            ))}
-            {hasMore && (<button onClick={() => setPage((prev) => prev + 1)}>
-                    Load More Posts.
-                </button>)}
+                        )}
+                        <p>Likes: {likeCounts[p.id] || 0}</p>
+                        {auth.role === 'ADMIN' && <button onClick={() => deletePost(p.appUserId, p.id)} style={{ color: 'white', backgroundColor: 'red', marginTop: '10px' }}>Delete Post (Admin)</button>}
+                        <button onClick={() => toggleComments(p.id)}>
+                            {showComments[p.id] ? "Hide Comments" : `Comments (${p.commentCount})`}
+                        </button>
+                    </div>
+                    {showComments[p.id] && <CommentSection postId={p.id} auth={auth} />}
+                </footer>
+            </article>
+        ))}
+        {hasMore && (<button onClick={() => setPage((prev) => prev + 1)}>
+            Load More Posts.
+        </button>)}
 
-        </>)
+    </>)
 
 
 }
 
 export async function fetchTimelinePosts(api, auth, userId, page = 0, size = 20) {
-    const res = await fetch(`${api}/appUsers/${userId}/posts/timeLinePosts?page=${page}&size=${size}`, {headers: basic(auth)});
+    const res = await fetch(`${api}/appUsers/${userId}/posts/timeLinePosts?page=${page}&size=${size}`, { headers: basic(auth) });
     if (!res.ok) throw new Error("Failed to fetch timeline posts");
     return res.json();
 }
 
 export function likePost(api, auth, setLikeStatus, setLikeCounts, appUserId, postId) {
-    fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", {method: "POST", headers: basic(auth)})
+    fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", { method: "POST", headers: basic(auth) })
         .then(response => {
             if (!response.ok) throw new Error(response.statusText);
-            setLikeStatus(prev => ({...prev, [postId]: true}));
-            setLikeCounts(prev => ({...prev, [postId]: (prev[postId] || 0) + 1}));
+            setLikeStatus(prev => ({ ...prev, [postId]: true }));
+            setLikeCounts(prev => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
         })
         .catch(error => console.error("Error in liking  post: ", error));
 }
 
 export function unlikePost(api, auth, setLikeStatus, setLikeCounts, appUserId, postId) {
-    fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", {method: "DELETE", headers: basic(auth)})
+    fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", { method: "DELETE", headers: basic(auth) })
         .then(response => {
             if (!response.ok) throw new Error(response.statusText);
-            setLikeStatus(prev => ({...prev, [postId]: false}));
-            setLikeCounts(prev => ({...prev, [postId]: Math.max((prev[postId] || 0) - 1, 0)}));
+            setLikeStatus(prev => ({ ...prev, [postId]: false }));
+            setLikeCounts(prev => ({ ...prev, [postId]: Math.max((prev[postId] || 0) - 1, 0) }));
         })
         .catch(error => console.error("Error in unliking  post: ", error));
 }
 
 export function hasUserLikedPost(api, auth, setLikeStatus, appUserId, postId) {
-    fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", {headers: basic(auth)})
+    fetch(api + "/appUsers/" + appUserId + "/posts/" + postId + "/like", { headers: basic(auth) })
         .then(response => {
             if (!response.ok) throw new Error(response.statusText);
             return response.json();
         }).then(hasUserLikedPost => {
-        setLikeStatus(prev => ({...prev, [postId]: hasUserLikedPost}));
-    })
+            setLikeStatus(prev => ({ ...prev, [postId]: hasUserLikedPost }));
+        })
         .catch(error => console.error("Error in checking like status", error));
 }
 
 export function numberOfLikePost(api, auth, setLikeCounts, postId) {
-    fetch(api + "/appUsers/posts/" + postId + "/likeCount", {headers: basic(auth)})
+    fetch(api + "/appUsers/posts/" + postId + "/likeCount", { headers: basic(auth) })
         .then(response => {
             if (!response.ok) throw new Error(response.statusText);
             return response.json();
         }).then(likeCount => {
-        setLikeCounts(prev => ({...prev, [postId]: likeCount}));
-    })
+            setLikeCounts(prev => ({ ...prev, [postId]: likeCount }));
+        })
         .catch(error => console.error("Error in getting no of likes of a post: ", error));
 }

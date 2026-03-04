@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import oth.ics.wtp.readinbackend.dtos.AppUserDto;
+import oth.ics.wtp.readinbackend.entities.AppUser;
 import oth.ics.wtp.readinbackend.services.AuthService;
 import oth.ics.wtp.readinbackend.services.FollowingService;
 
@@ -26,19 +27,28 @@ public class FollowingController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "appUsers/{followerId}/following/{followeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void followUser(HttpServletRequest request, @PathVariable("followerId") long followerId, @PathVariable("followeeId") long followeeId) {
-        authService.getAuthenticatedUser(request);
+    public void followUser(HttpServletRequest request, @PathVariable("followerId") long followerId,
+            @PathVariable("followeeId") long followeeId) {
+        AppUser requester = authService.getAuthenticatedUser(request);
+        if (!requester.getId().equals(followerId) && !authService.isAdmin(requester)) {
+            throw new SecurityException("Unauthorized");
+        }
         followingService.followUser(followerId, followeeId);
     }
 
     @DeleteMapping(value = "appUsers/{followerId}/following/{followeeId}")
-    public void unfollowUser(HttpServletRequest request, @PathVariable("followerId") long followerId, @PathVariable("followeeId") long followeeId) {
-        authService.getAuthenticatedUser(request);
+    public void unfollowUser(HttpServletRequest request, @PathVariable("followerId") long followerId,
+            @PathVariable("followeeId") long followeeId) {
+        AppUser requester = authService.getAuthenticatedUser(request);
+        if (!requester.getId().equals(followerId) && !authService.isAdmin(requester)) {
+            throw new SecurityException("Unauthorized");
+        }
         followingService.unfollowUser(followerId, followeeId);
     }
 
     @GetMapping(value = "appUsers/{followerId}/following/{followeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean isFollowing(HttpServletRequest request, @PathVariable long followerId, @PathVariable long followeeId) {
+    public boolean isFollowing(HttpServletRequest request, @PathVariable long followerId,
+            @PathVariable long followeeId) {
         authService.getAuthenticatedUser(request);
         return followingService.isFollowing(followerId, followeeId);
     }
@@ -54,6 +64,5 @@ public class FollowingController {
         authService.getAuthenticatedUser(request);
         return followingService.getFollowings(appUserId);
     }
-
 
 }
