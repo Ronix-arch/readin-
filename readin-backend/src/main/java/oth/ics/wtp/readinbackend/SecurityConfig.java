@@ -49,7 +49,8 @@ public class SecurityConfig {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
         configuration.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:80",
                 "http://localhost:3000", "http://localhost:8080", "http://localhost",
-                "https://readin-blogging.netlify.app")); // Add frontend origins
+                "https://readin-blogging.netlify.app", "https://readin-production.up.railway.app")); // Add frontend
+                                                                                                     // origins
         configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
