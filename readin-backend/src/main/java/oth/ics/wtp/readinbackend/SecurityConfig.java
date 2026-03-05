@@ -35,6 +35,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in this stateless API
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Allow CORS
+                                                                                                         // preflight
+                                                                                                         // requests
                         .requestMatchers("/appUsers", "/files/**", "/ws/**").permitAll() // Allow user creation, static
                                                                                          // uploads, and WS handshake
                         .anyRequest().authenticated() // All other requests require authentication
