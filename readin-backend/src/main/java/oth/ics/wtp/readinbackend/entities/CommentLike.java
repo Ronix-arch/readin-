@@ -8,12 +8,12 @@ import java.time.Instant;
 
 @Entity
 @Table(uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"app_user_id", "comment_id"})
+        @UniqueConstraint(columnNames = { "app_user_id", "comment_id" })
 })
 public class CommentLike {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -8,10 +8,11 @@ import java.time.Instant;
 import static org.hibernate.annotations.OnDeleteAction.CASCADE;
 
 @Entity
-@Table(name = "likes", uniqueConstraints = {@UniqueConstraint(name = "uniquepostuser", columnNames = {"app_user_id", "post_id"})})
+@Table(name = "likes", uniqueConstraints = {
+        @UniqueConstraint(name = "uniquepostuser", columnNames = { "app_user_id", "post_id" }) })
 public class Like {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     @JoinColumn(name = "app_user_id")

@@ -4,15 +4,16 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 
-@Table(name = "following", uniqueConstraints = {@UniqueConstraint(name = "unique_follower_followee", columnNames = {"follower_id", "followee_id"})})
+@Table(name = "following", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_follower_followee", columnNames = { "follower_id", "followee_id" }) })
 
 @Entity
 public class Following {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private AppUser follower;  // @JoinColumn(name = "follower",nullable = false)
+    private AppUser follower; // @JoinColumn(name = "follower",nullable = false)
     @ManyToOne
     private AppUser followee; //
     // @JoinColumn(name = "followee",nullable = false)
