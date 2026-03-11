@@ -9,8 +9,11 @@ in this app, one can
 * create, edit and delete his own posts
 * follow other users and see there posts 
 * Un-liking posts currently liked by the user
-* <img width="776" height="1315" alt="image" src="https://github.com/user-attachments/assets/dcc7e241-dd23-4ed8-9f16-66f291ac6f77" />
-
+* message and recieve message  from users followers
+* get notified when ones follows ofr sends the user a messages  
+* <img width="776" height="1315" alt="image" src="https://github.com/user-attachments/assets/dcc7e241-dd23-4ed8-9f16-66f291ac6f77" /> 
+*  The mobile version 
+*  ![picformobile](https://github.com/user-attachments/assets/e339eae4-864f-445a-ba23-2a31312ee759)
 
 * Deleting one’s own posts (in profile tab)
 * Managing one’s own user profile (it displays the name , profile image,number of posts created sofar, number of followers, number of followees, Also in the User Profile , one can create, update, and delete their posts)
