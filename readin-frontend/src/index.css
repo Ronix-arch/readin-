@@ -16,22 +16,3 @@ button.delete {
 button {
   margin-bottom: var(--pico-spacing);
 }
-
-/* Mobile Responsive Navigation */
-@media (max-width: 768px) {
-  nav {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  nav ul {
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 0;
-    margin-top: 10px;
-  }
-
-  nav ul li {
-    padding: 5px;
-  }
-}
